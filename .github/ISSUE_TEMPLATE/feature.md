@@ -1,5 +1,9 @@
-name:feature
-about:request a new feature
+---
+name: "Feature"
+about: "New feature development"
+title: ""
+labels: feature
+---
 
 배경
 -
