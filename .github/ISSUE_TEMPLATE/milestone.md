@@ -1,6 +1,6 @@
 ---
 name: "🎯 Milestone"
-about: "프로젝트 마일스톤별 목표 및 하위 이슈"
+about: "Project milestones and goals"
 title: "[택시기사앱 4.n]"
 labels: milestone
 ---
