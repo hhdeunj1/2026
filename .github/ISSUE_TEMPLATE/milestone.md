@@ -6,12 +6,10 @@ labels: milestone
 ---
 
 ## 목표
--
 - 목표1
 - 목표2
 
 ## 일정
--
 - 배포일: 
   - UX
   - Design
@@ -19,9 +17,7 @@ labels: milestone
   - Server
   - QA
 
-
-## Spec
--
+## Spec [[Figma >]](figmaURL)
 - 목표1
   - 하위 이슈1 URL
   - 하위 이슈2 URL
