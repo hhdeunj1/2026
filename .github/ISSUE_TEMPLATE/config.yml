@@ -1,1 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature Request
+    url: https://github.com/hhdeunji/2026/issues/new?template=feature.md
+    about: Request a new feature
+  - name: Task
+    url: https://github.com/hhdeunji/2026/issues/new?template=task.md
+    about: Create a new task
 
