@@ -1,7 +1,7 @@
 ---
 name: "👩‍💻Research"
 about: "User research planning and results"
-title: ""
+title: "[인터뷰]/[서베이]/[데이터].."
 custom_fields:
   type: Task
 ---
