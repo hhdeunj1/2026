@@ -15,6 +15,7 @@ Spec [[Figma >]](figmaURL)
 -
 
 > 한줄 요약(개념)
+> 진입 경로
 
 ### AS-IS
 - 기존 형상 
