@@ -2,7 +2,8 @@
 name: "✨Feature"
 about: "New feature development"
 title: ""
-labels: feature
+custom_fields:
+  type: Feature
 ---
 
 ## 배경
