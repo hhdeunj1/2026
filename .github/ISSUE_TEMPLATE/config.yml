@@ -1,8 +1,1 @@
 blank_issues_enabled: true
-contact_links:
-  - name: Feature
-    url: https://github.com/hhdeunj1/2026/blob/main/.github/ISSUE_TEMPLATE/feature.md
-    about: Request a new feature
-  - name: Milestone
-    url: https://github.com/hhdeunj1/2026/blob/main/.github/ISSUE_TEMPLATE/milestone.md
-    about: Project milestones and goals
