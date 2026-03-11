@@ -1,7 +1,7 @@
 ---
 name: "🎯Milestone"
 about: "Project milestones and goals"
-title: "[택시기사앱 4.n]"
+title: "[택시기사앱 4.n] 마일스톤명"
 Lable: "Epic"
 custom_fields:
   type: Task
