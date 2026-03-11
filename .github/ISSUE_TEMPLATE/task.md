@@ -2,7 +2,8 @@
 name: "✅Task"
 about: "general tasks and to-dos"
 title: ""
-labels: task
+custom_fields:
+  type: Task
 ---
 
 ## 배경
