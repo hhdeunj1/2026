@@ -1,5 +1,5 @@
 name:feature
-about:
+about:new feature development
 
 배경
 -
