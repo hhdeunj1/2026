@@ -1,17 +1,17 @@
 ---
-name: "Feature"
+name: "✨Feature"
 about: "New feature development"
 title: ""
 labels: feature
 ---
 
-배경
+## 배경
 -
 - 배경 작성
 - 참고 링크
 
 
-Spec [[Figma >]](figmaURL)
+## Spec [[Figma >]](figmaURL)
 -
 
 > 한줄 요약(개념)
