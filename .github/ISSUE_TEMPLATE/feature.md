@@ -1,1 +1,28 @@
-LS0tCm5hbWU6ICLinKjGkEZlYXR1cmUiCmFib3V0OiAiTmV3IGZlYXR1cmUgZGV2ZWxvcG1lbnQiCnRpdGxlOiAiW+ydvO67jW+hv10vW+yd8uiHoF0vW+ucjF0vW+ub/suKXS9b6rO8Rl0vW+uynF0iCmN1c3RvbV9maWVsZHM6CiAgdHlwZTogRmVhdHVyZQotLS0KCiMjIOuCmOqyg+yekAotIOuCmOqyg+yekCDsnZHsi5wKLSDsnKDqs6Ag66as7Ja0CgoKIyMg6rO86riUI+ygleuKlwoKaGFuc3VsIHlyeWFnCgo+IFvsoJXsnpAg寄6aXO3cpF0gCj4gW+uyp+uKlCDquIfloIDsnphdIFvtmKjrNpre66asXSjigKZmaWdtYVVSTCkKPiBb7Iq17YWM IE1EXSBbTUTtjIzsnbTrjIDguKDshLHroKVdKOKApuG1j+ykkSDri4jrpqzloIDsnpgpCgoKIyMgU3BlYyBbW0ZpZ21hPl1dKGZpZ21hVVJMKQoKIyMjIEFTLUlTCi0g6rCY7KGxIOu5heyXhQoKIyMjIFRPLUJFCi0g67Cp6rCxIOu5heyXhQ==
+---
+name: "✨Feature"
+about: "New feature development"
+title: "[온보딩]/[운행]/[콜]/[메뉴]/[공통]/[기타]"
+custom_fields:
+  type: Feature
+---
+
+## 배경
+- 배경 작성
+- 참고 링크
+
+
+## 개요
+한줄 요약
+
+> [진입 경로] 
+> [연관 화면] [프레임명](figmaURL)
+> [연관 MD] [MD파일명 > 섹션 경로](앵커 링크)
+
+
+## Spec [[Figma>]](figmaURL)
+
+### AS-IS
+- 기존 형상
+
+### TO-BE
+- 변경 형상
