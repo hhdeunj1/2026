@@ -2,9 +2,7 @@
 name: "👩‍💻Research"
 about: "research planning and results"
 title: "[YY년M월] [인터뷰]/[서베이]/[데이터분석].. 리서치명"
-labels: ["Research"]
-custom_fields:
-  type: Task
+type: Task
 ---
 
 ## 배경 및 목표

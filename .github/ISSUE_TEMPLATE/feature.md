@@ -2,9 +2,7 @@
 name: "✨Feature"
 about: "New feature development"
 title: "[온보딩]/[운행]/[콜]/[메뉴]/[공통]/[기타]"
-labels: ["Feature"]
-custom_fields:
-  type: Feature
+type: Feature
 ---
 
 ## 배경
