@@ -1,0 +1,754 @@
+<meta charset="UTF-8">
+<title>PUDO 디펜던시맵</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F1F3F8;
+    --surface: #FFFFFF;
+    --surface-2: #FAFBFD;
+    --border: #DADFE7;
+    --border-soft: #E6E9F0;
+    --ink: #1B2029;
+    --ink-dim: #5B6472;
+    --ink-faint: #8A90A0;
+
+    --c-map: #966A17;
+    --c-common: #35479A;
+    --c-rider: #AE4F2E;
+    --c-driver: #1F7A66;
+
+    --status-progress: #2B5FD9;
+    --status-progress-bg: #E7EDFC;
+    --status-fixed: #1C8657;
+    --status-fixed-bg: #E4F4EC;
+    --status-icebox: #5B6472;
+    --status-icebox-bg: #EAEDF1;
+    --status-inbox: #8B8F98;
+    --status-inbox-bg: #F0F1F4;
+
+    --shadow: 0 1px 2px rgba(20, 24, 34, 0.04), 0 6px 16px -8px rgba(20, 24, 34, 0.10);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11141C;
+      --surface: #1A1F29;
+      --surface-2: #1F2531;
+      --border: #2D3340;
+      --border-soft: #262C38;
+      --ink: #E9EBF0;
+      --ink-dim: #9CA3B2;
+      --ink-faint: #6C7383;
+
+      --c-map: #D9A53F;
+      --c-common: #8296E6;
+      --c-rider: #E28A68;
+      --c-driver: #4FC4A8;
+
+      --status-progress: #85ACFF;
+      --status-progress-bg: #1E2A47;
+      --status-fixed: #63DBA6;
+      --status-fixed-bg: #163228;
+      --status-icebox: #9FA8B6;
+      --status-icebox-bg: #262B34;
+      --status-inbox: #AEB4BF;
+      --status-inbox-bg: #232730;
+
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 24px -10px rgba(0,0,0,0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #11141C;
+    --surface: #1A1F29;
+    --surface-2: #1F2531;
+    --border: #2D3340;
+    --border-soft: #262C38;
+    --ink: #E9EBF0;
+    --ink-dim: #9CA3B2;
+    --ink-faint: #6C7383;
+
+    --c-map: #D9A53F;
+    --c-common: #8296E6;
+    --c-rider: #E28A68;
+    --c-driver: #4FC4A8;
+
+    --status-progress: #85ACFF;
+    --status-progress-bg: #1E2A47;
+    --status-fixed: #63DBA6;
+    --status-fixed-bg: #163228;
+    --status-icebox: #9FA8B6;
+    --status-icebox-bg: #262B34;
+    --status-inbox: #AEB4BF;
+    --status-inbox-bg: #232730;
+
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 24px -10px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Source Sans 3", "Noto Sans KR", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px 28px 72px;
+  }
+
+  header.top {
+    margin-bottom: 30px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: "Archivo", "Source Sans 3", sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 3.6vw, 38px);
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--ink-dim);
+    max-width: 68ch;
+    margin: 0 0 10px;
+  }
+
+  .lede b { color: var(--ink); font-weight: 600; }
+
+  .lede-list {
+    margin: 0 0 26px;
+    padding: 0;
+    max-width: 62ch;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    list-style: none;
+  }
+
+  .lede-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-dim);
+  }
+
+  .lede-list li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 9px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+  }
+
+  .lede-list b { color: var(--ink); font-weight: 600; }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    align-items: center;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+  }
+
+  .legend-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .legend-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-right: 2px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-dim);
+  }
+
+  .chip .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--dot-color, var(--ink-faint));
+    flex: none;
+  }
+
+  .pill-sample {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .pill-sample.progress { color: var(--status-progress); background: var(--status-progress-bg); }
+  .pill-sample.fixed { color: var(--status-fixed); background: var(--status-fixed-bg); }
+  .pill-sample.icebox { color: var(--status-icebox); background: var(--status-icebox-bg); }
+  .pill-sample.inbox { color: var(--status-inbox); background: var(--status-inbox-bg); }
+  .pill-sample.planned {
+    color: var(--ink-faint);
+    background: transparent;
+    border: 1px dashed var(--ink-faint);
+  }
+
+  .divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+    margin: 0 2px;
+  }
+
+  .spacer { flex: 1 1 auto; }
+
+  .btn {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-dim);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+
+  .save-state {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 128px;
+  }
+
+  /* ---- matrix ---- */
+
+  .matrix-shell {
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    background: var(--surface-2);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .matrix-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .matrix-scroll::-webkit-scrollbar { height: 10px; }
+  .matrix-scroll::-webkit-scrollbar-track { background: transparent; }
+  .matrix-scroll::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+  }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 158px repeat(5, 234px);
+    min-width: fit-content;
+  }
+
+  .col-head {
+    position: sticky;
+    top: 0;
+    background: var(--surface-2);
+    padding: 18px 14px 14px;
+    border-bottom: 1px solid var(--border-soft);
+    font-family: "Archivo", sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ink-dim);
+    text-wrap: balance;
+    line-height: 1.3;
+  }
+
+  .col-head.corner { background: var(--surface-2); }
+
+  .row-label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 20px 14px 20px 20px;
+    border-right: 1px solid var(--border-soft);
+    background: var(--surface-2);
+  }
+
+  .row-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: "Archivo", sans-serif;
+    font-weight: 800;
+    font-size: 14.5px;
+    color: var(--lane-accent);
+  }
+  .row-tag::before {
+    content: "";
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    background: var(--lane-accent);
+    flex: none;
+  }
+
+  .row-sub {
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    line-height: 1.4;
+  }
+
+  .cell {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border-right: 1px solid var(--border-soft);
+    border-top: 1px solid var(--border-soft);
+    min-height: 54px;
+  }
+
+  .lane-row[data-lane="map"] { --lane-accent: var(--c-map); }
+  .lane-row[data-lane="common"] { --lane-accent: var(--c-common); }
+  .lane-row[data-lane="rider"] { --lane-accent: var(--c-rider); }
+  .lane-row[data-lane="driver"] { --lane-accent: var(--c-driver); }
+
+  .node {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-top: 3px solid var(--lane-accent);
+    border-radius: 10px;
+    padding: 10px 11px 9px;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: box-shadow 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+  }
+
+  a.node:hover {
+    box-shadow: var(--shadow);
+    border-color: var(--lane-accent);
+  }
+
+  .node.is-planned {
+    border-top-style: dashed;
+    border-top-width: 2px;
+    background: transparent;
+    border-color: var(--border);
+  }
+  .node.is-planned .code { color: var(--ink-faint); font-style: italic; }
+
+  .node.off-target {
+    opacity: 0.42;
+    filter: grayscale(55%);
+  }
+  .node.off-target:hover,
+  .node.off-target:focus-within {
+    opacity: 1;
+    filter: none;
+  }
+
+  .node-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--lane-accent);
+    background: color-mix(in srgb, var(--lane-accent) 14%, transparent);
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+
+  .code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+  }
+
+  .node-title {
+    font-size: 12.6px;
+    line-height: 1.38;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+    cursor: text;
+    border-radius: 4px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+  }
+  .node-title:hover { background: color-mix(in srgb, var(--lane-accent) 10%, transparent); }
+  .node-title[contenteditable="true"] {
+    background: var(--surface);
+    outline: 1.5px dashed var(--lane-accent);
+  }
+
+  .node-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .status {
+    display: inline-flex;
+    align-self: flex-start;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 999px;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+  .status.progress { color: var(--status-progress); background: var(--status-progress-bg); }
+  .status.fixed { color: var(--status-fixed); background: var(--status-fixed-bg); }
+  .status.icebox { color: var(--status-icebox); background: var(--status-icebox-bg); }
+  .status.inbox { color: var(--status-inbox); background: var(--status-inbox-bg); }
+  .status.planned {
+    color: var(--ink-faint);
+    background: transparent;
+    border: 1px dashed var(--ink-faint);
+  }
+
+  .meta {
+    font-size: 10.8px;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+    cursor: text;
+    border-radius: 4px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+  }
+  .meta:hover { background: color-mix(in srgb, var(--lane-accent) 10%, transparent); }
+  .meta[contenteditable="true"] {
+    background: var(--surface);
+    outline: 1.5px dashed var(--lane-accent);
+  }
+
+  .note {
+    font-size: 10.3px;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  .cell-empty {
+    font-size: 11px;
+    color: var(--ink-faint);
+    opacity: 0.5;
+  }
+
+  footer.foot {
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  footer.foot .k { font-family: "IBM Plex Mono", monospace; }
+</style>
+
+<div class="page">
+  <header class="top">
+    <p class="eyebrow">PUDO · Cross-product issue matrix</p>
+    <h1>PUDO 디펜던시맵</h1>
+    <p class="lede">
+      PUDO(승하차 지점) 관련 이슈는 4개 레포에 흩어져 있지만 실제 서로 맞물려 있습니다.
+    </p>
+    <ul class="lede-list">
+      <li><b>맵데이터</b> — 승하차 가능 여부를 결정하는 기반 데이터</li>
+      <li><b>공통</b> — PUDO 데이터 구조와 negotiation 등 코어 정책·시나리오</li>
+      <li><b>라이더앱 / 드라이버앱</b> — 같은 상황을 각자의 화면으로 보여주는 승객·기사 UX</li>
+    </ul>
+
+    <div class="toolbar">
+      <div class="legend-group">
+        <span class="legend-label">레포</span>
+        <span class="chip"><span class="dot" style="--dot-color: var(--c-map)"></span>맵데이터</span>
+        <span class="chip"><span class="dot" style="--dot-color: var(--c-common)"></span>공통</span>
+        <span class="chip"><span class="dot" style="--dot-color: var(--c-rider)"></span>라이더앱</span>
+        <span class="chip"><span class="dot" style="--dot-color: var(--c-driver)"></span>드라이버앱</span>
+      </div>
+      <div class="divider"></div>
+      <div class="legend-group">
+        <span class="pill-sample progress">진행중</span>
+        <span class="pill-sample fixed">스펙확정</span>
+        <span class="pill-sample icebox">아이스박스</span>
+        <span class="pill-sample inbox">인박스</span>
+        <span class="pill-sample planned">미생성</span>
+      </div>
+      <div class="spacer"></div>
+      <span class="save-state" id="saveState">저장됨</span>
+      <button class="btn" id="copyBtn">JSON 복사</button>
+    </div>
+  </header>
+
+  <div class="matrix-shell">
+    <div class="matrix-scroll" id="scroll">
+      <div class="matrix-grid" id="grid"></div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span class="k">2026-10-04</span>
+    <span>기준 · 제목·마일스톤은 더블클릭, 현황 뱃지는 클릭해서 바로 수정 — 변경은 이 브라우저에 자동 저장됩니다</span>
+  </footer>
+</div>
+
+<script>
+  const STORAGE_KEY = "pudo-map-nodes-v2";
+
+  const REPO = {
+    map: "hkmc-airlab/shucle-map-tool-doc",
+    common: "hkmc-airlab/shucle-rider",
+    rider: "hkmc-airlab/shucle-rider",
+    driver: "hkmc-airlab/shucle-DriverVehicle-product",
+  };
+
+  const LANES = [
+    { id: "map", label: "맵데이터", sub: "기반 작업", tag: "맵툴" },
+    { id: "common", label: "공통", sub: "코어 시나리오", tag: "공통" },
+    { id: "rider", label: "라이더앱", sub: "승객 UX", tag: "라앱" },
+    { id: "driver", label: "드라이버앱", sub: "기사 UX", tag: "드앱" },
+  ];
+
+  const COLUMNS = [
+    { id: "build", label: "PUDO 구축" },
+    { id: "ops", label: "PUDO 운영 및 고도화" },
+    { id: "scenario", label: "운행/정차 시나리오" },
+    { id: "dispatch", label: "배차·가호출 UX" },
+    { id: "data", label: "기타 UX" },
+  ];
+
+  const DEFAULT_NODES = [
+    { id: "map-blacklist", lane: "map", col: "build", code: "532", title: "승하차 지점(주정차 불가) 관리 기능", status: "progress", meta: "High · 4.14.0" },
+    { id: "map-hae-view", lane: "map", col: "build", code: "545", title: "HAE 데이터 연동 협의 및 뷰어 레이어 1차 개발", status: "progress", meta: "High · 4.14.0" },
+    { id: "map-hae-block", lane: "map", col: "build", code: "546", title: "HAE 데이터 차단 데이터로 사용", status: "inbox", meta: "P2 · 4.15.0" },
+    { id: "map-whitelist", lane: "map", col: "build", code: "537", title: "앱 PuDo 데이터 연동", status: "inbox", meta: "P1 · 4.15.0" },
+    { id: "map-zonecheck", lane: "map", col: "build", code: "569", title: "푸도 가능 영역 확인 기능 추가", status: "inbox", meta: "P3 · 4.15.0" },
+    { id: "map-usecheck", lane: "map", col: "ops", code: "571", title: "영역 PuDo 사용 여부 체크 옵션 추가", status: "icebox", meta: "4.16.0" },
+    { id: "map-gap", lane: "map", col: "ops", code: "572", title: "도로 이격 발생 시 블랙리스트 데이터 처리", status: "icebox", meta: "4.16.0" },
+    { id: "map-points", lane: "map", col: "ops", code: "536", title: "PuDo Points 관리 기능", status: "icebox", meta: "P2 · 미정" },
+
+    { id: "common-struct", lane: "common", col: "build", code: "3241", title: "PUDO 데이터 구조 및 관리 정책", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "common-log", lane: "common", col: "build", code: "3270", title: "정차 로그 스키마 정의", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "common-upgrade", lane: "common", col: "ops", code: "3269", title: "정차 데이터 활용 PUDO 고도화", status: "icebox", meta: "P1 · 미정" },
+    { id: "common-pick", lane: "common", col: "scenario", code: "3239", title: "Pick 정차 Fallback 시나리오 (negotiation)", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "common-drop", lane: "common", col: "scenario", code: "3240", title: "Drop 정차 Fallback 시나리오 (negotiation)", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "common-fallback", lane: "common", col: "scenario", code: "3268", title: "자율주행 운행 Fallback 시나리오 정의", status: "icebox", meta: "P1 · 미정" },
+
+    { id: "rider-dispatch", lane: "rider", col: "dispatch", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", meta: "P1 · 4.15.0" },
+    { id: "rider-ux", lane: "rider", col: "dispatch", code: "3288", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "rider-search", lane: "rider", col: "dispatch", code: "3227", title: "통합검색 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "rider-quick", lane: "rider", col: "dispatch", code: "3228", title: "빠른호출 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "rider-pickfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Pickup negotiation)", status: "planned", meta: "P1 · 4.15.0" },
+    { id: "rider-dropfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Drop-off negotiation)", status: "planned", meta: "P1 · 4.15.0" },
+    { id: "rider-usage", lane: "rider", col: "data", code: "3265", title: "이용/혜택내역 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "rider-history", lane: "rider", col: "dispatch", code: "3285", title: "검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0" },
+
+    { id: "driver-stop", lane: "driver", col: "scenario", code: "1028", title: "정차 위치 변경/실패 안내", status: "progress", meta: "P1 · 4.15.0", note: "cf. 공통 #2329" },
+  ];
+
+  const STATUS_LABEL = { progress: "진행중", fixed: "스펙확정", icebox: "아이스박스", inbox: "인박스", planned: "미생성" };
+  const STATUS_CYCLE = ["progress", "fixed", "icebox", "inbox", "planned"];
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return JSON.parse(JSON.stringify(DEFAULT_NODES));
+  }
+
+  let data = loadData();
+  const saveStateEl = document.getElementById("saveState");
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    saveStateEl.textContent = "저장됨 · " + new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function isOffTarget(meta) {
+    return !meta.includes("4.15.0") && !meta.includes("4.14.0");
+  }
+
+  const grid = document.getElementById("grid");
+
+  function render() {
+    grid.innerHTML = "";
+    grid.style.gridTemplateRows = `auto repeat(${LANES.length}, auto)`;
+
+    const corner = document.createElement("div");
+    corner.className = "col-head corner";
+    grid.appendChild(corner);
+
+    COLUMNS.forEach(col => {
+      const head = document.createElement("div");
+      head.className = "col-head";
+      head.textContent = col.label;
+      grid.appendChild(head);
+    });
+
+    LANES.forEach(lane => {
+      const label = document.createElement("div");
+      label.className = "row-label lane-row";
+      label.dataset.lane = lane.id;
+      label.innerHTML = `<span class="row-tag">${lane.label}</span><span class="row-sub">${lane.sub}</span>`;
+      grid.appendChild(label);
+
+      COLUMNS.forEach(col => {
+        const cell = document.createElement("div");
+        cell.className = "cell lane-row";
+        cell.dataset.lane = lane.id;
+
+        const items = data.filter(n => n.lane === lane.id && n.col === col.id);
+        if (!items.length) {
+          const empty = document.createElement("div");
+          empty.className = "cell-empty";
+          empty.textContent = "—";
+          cell.appendChild(empty);
+        } else {
+          items.forEach(n => cell.appendChild(renderNode(lane, n)));
+        }
+        grid.appendChild(cell);
+      });
+    });
+  }
+
+  function renderNode(lane, n) {
+    const el = document.createElement(n.code ? "a" : "div");
+    if (n.code) {
+      el.href = `https://github.com/${REPO[lane.id]}/issues/${n.code}`;
+      el.target = "_blank";
+      el.rel = "noopener";
+    }
+    el.className = "node"
+      + (n.status === "planned" ? " is-planned" : "")
+      + (isOffTarget(n.meta) ? " off-target" : "");
+    el.dataset.id = n.id;
+
+    const codeHtml = n.code ? `<span class="code">#${n.code}</span>` : `<span class="code">미생성</span>`;
+
+    el.innerHTML = `
+      <div class="node-top">
+        <span class="tag">${lane.tag}</span>
+        ${codeHtml}
+      </div>
+      <p class="node-title" data-field="title">${n.title}</p>
+      <div class="node-bottom">
+        <button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button>
+        <span class="meta" data-field="meta">${n.meta}</span>
+        ${n.note ? `<span class="note">${n.note}</span>` : ""}
+      </div>
+    `;
+
+    const titleEl = el.querySelector('[data-field="title"]');
+    const metaEl = el.querySelector('[data-field="meta"]');
+    const statusEl = el.querySelector('[data-field="status"]');
+
+    function makeEditable(fieldEl, key) {
+      fieldEl.addEventListener("dblclick", ev => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        fieldEl.contentEditable = "true";
+        fieldEl.focus();
+        document.execCommand("selectAll", false, null);
+      });
+      fieldEl.addEventListener("click", ev => {
+        if (fieldEl.contentEditable === "true") ev.preventDefault();
+      });
+      fieldEl.addEventListener("blur", () => {
+        fieldEl.contentEditable = "false";
+        const val = fieldEl.textContent.trim();
+        if (val && val !== n[key]) {
+          n[key] = val;
+          save();
+          if (key === "meta") render();
+        }
+      });
+      fieldEl.addEventListener("keydown", ev => {
+        if (ev.key === "Enter") { ev.preventDefault(); fieldEl.blur(); }
+        if (ev.key === "Escape") { fieldEl.textContent = n[key]; fieldEl.blur(); }
+      });
+    }
+
+    makeEditable(titleEl, "title");
+    makeEditable(metaEl, "meta");
+
+    statusEl.addEventListener("click", ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(n.status) + 1) % STATUS_CYCLE.length];
+      n.status = next;
+      save();
+      render();
+    });
+
+    return el;
+  }
+
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    const btn = document.getElementById("copyBtn");
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+      btn.textContent = "복사됨!";
+    } catch (e) {
+      btn.textContent = "복사 실패";
+    }
+    setTimeout(() => { btn.textContent = "JSON 복사"; }, 1600);
+  });
+
+  render();
+</script>
