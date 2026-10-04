@@ -623,18 +623,19 @@
     { id: "map-points", lane: "map", col: "ops", code: "536", title: "PuDo Points 관리 기능", status: "icebox", meta: "P2 · 미정" },
 
     { id: "common-struct", lane: "common", col: "build", code: "3241", title: "PUDO 데이터 구조 및 관리 정책", status: "progress", meta: "P1 · 4.15.0" },
-    { id: "common-log", lane: "common", col: "build", code: "3270", title: "정차 로그 스키마 정의", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "common-log", lane: "common", col: "build", code: "3270", title: "정차 로그 스키마 정의", status: "progress", meta: "P1 · 4.15.0", rel: [{ to: "common-upgrade" }] },
     { id: "common-upgrade", lane: "common", col: "ops", code: "3269", title: "정차 데이터 활용 PUDO 고도화", status: "icebox", meta: "P1 · 미정" },
     { id: "common-pick", lane: "common", col: "scenario", code: "3239", title: "Pick 정차 Fallback 시나리오 (negotiation)", status: "progress", meta: "P1 · 4.15.0", rel: [{ to: "rider-pickfb" }] },
     { id: "common-drop", lane: "common", col: "scenario", code: "3240", title: "Drop 정차 Fallback 시나리오 (negotiation)", status: "progress", meta: "P1 · 4.15.0", rel: [{ to: "rider-dropfb" }] },
     { id: "common-fallback", lane: "common", col: "scenario", code: "3268", title: "자율주행 운행 Fallback 시나리오 정의", status: "icebox", meta: "P1 · 미정" },
 
     { id: "rider-dispatch", lane: "rider", col: "dispatch", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", meta: "P1 · 4.15.0" },
-    { id: "rider-ux", lane: "rider", col: "dispatch", code: "3288", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "rider-ux", lane: "rider", col: "dispatch", code: "3288", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0", rel: [{ to: "rider-search" }, { to: "rider-quick" }] },
+    { id: "rider-point", lane: "rider", col: "dispatch", code: "3286", title: "PUDO Point 노출 로직 (반경 구간별 확장 탐색)", status: "progress", meta: "P1 · 4.15.0" },
     { id: "rider-search", lane: "rider", col: "dispatch", code: "3227", title: "통합검색 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0" },
     { id: "rider-quick", lane: "rider", col: "dispatch", code: "3228", title: "빠른호출 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0" },
-    { id: "rider-pickfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Pickup negotiation)", status: "planned", meta: "P1 · 4.15.0", rel: [{ to: "common-pick" }] },
-    { id: "rider-dropfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Drop-off negotiation)", status: "planned", meta: "P1 · 4.15.0", rel: [{ to: "common-drop" }] },
+    { id: "rider-pickfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Pickup negotiation)", status: "planned", meta: "P1 · 4.15.0" },
+    { id: "rider-dropfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Drop-off negotiation)", status: "planned", meta: "P1 · 4.15.0" },
     { id: "rider-usage", lane: "rider", col: "data", code: "3265", title: "이용/혜택내역 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0" },
     { id: "rider-history", lane: "rider", col: "dispatch", code: "3285", title: "검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0" },
 
@@ -746,12 +747,6 @@
         path.setAttribute("stroke-dasharray", "3 5");
         path.setAttribute("opacity", "0.85");
         relLinesEl.appendChild(path);
-
-        const arrowDirA = sideA === "right" ? "left" : "right";
-        const arrowA = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-        arrowA.setAttribute("points", arrowPolygonPoints(ptA.x, ptA.y, arrowDirA));
-        arrowA.setAttribute("fill", `var(--c-${n.lane})`);
-        relLinesEl.appendChild(arrowA);
 
         const arrowDirB = sideB === "right" ? "left" : "right";
         const arrowB = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
