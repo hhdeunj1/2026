@@ -483,6 +483,33 @@
     font-style: italic;
   }
 
+  .rel-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--rel-color);
+    background: color-mix(in srgb, var(--rel-color) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--rel-color) 45%, transparent);
+    cursor: pointer;
+    padding: 2px 7px;
+    border-radius: 999px;
+    width: fit-content;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .rel-tag:hover {
+    background: color-mix(in srgb, var(--rel-color) 28%, transparent);
+    transform: translateY(-1px);
+  }
+
+  @keyframes relFlash {
+    0%, 100% { box-shadow: none; }
+    30% { box-shadow: 0 0 0 3px var(--lane-accent); }
+  }
+  .rel-flash { animation: relFlash 1.1s ease; }
+
   .cell-empty {
     font-size: 11px;
     color: var(--ink-faint);
@@ -577,16 +604,16 @@
     { id: "common-struct", lane: "common", col: "build", code: "3241", title: "PUDO 데이터 구조 및 관리 정책", status: "progress", meta: "P1 · 4.15.0" },
     { id: "common-log", lane: "common", col: "build", code: "3270", title: "정차 로그 스키마 정의", status: "progress", meta: "P1 · 4.15.0" },
     { id: "common-upgrade", lane: "common", col: "ops", code: "3269", title: "정차 데이터 활용 PUDO 고도화", status: "icebox", meta: "P1 · 미정" },
-    { id: "common-pick", lane: "common", col: "scenario", code: "3239", title: "Pick 정차 Fallback 시나리오 (negotiation)", status: "progress", meta: "P1 · 4.15.0" },
-    { id: "common-drop", lane: "common", col: "scenario", code: "3240", title: "Drop 정차 Fallback 시나리오 (negotiation)", status: "progress", meta: "P1 · 4.15.0" },
+    { id: "common-pick", lane: "common", col: "scenario", code: "3239", title: "Pick 정차 Fallback 시나리오 (negotiation)", status: "progress", meta: "P1 · 4.15.0", rel: [{ to: "rider-pickfb" }] },
+    { id: "common-drop", lane: "common", col: "scenario", code: "3240", title: "Drop 정차 Fallback 시나리오 (negotiation)", status: "progress", meta: "P1 · 4.15.0", rel: [{ to: "rider-dropfb" }] },
     { id: "common-fallback", lane: "common", col: "scenario", code: "3268", title: "자율주행 운행 Fallback 시나리오 정의", status: "icebox", meta: "P1 · 미정" },
 
     { id: "rider-dispatch", lane: "rider", col: "dispatch", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", meta: "P1 · 4.15.0" },
     { id: "rider-ux", lane: "rider", col: "dispatch", code: "3288", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0" },
     { id: "rider-search", lane: "rider", col: "dispatch", code: "3227", title: "통합검색 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0" },
     { id: "rider-quick", lane: "rider", col: "dispatch", code: "3228", title: "빠른호출 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0" },
-    { id: "rider-pickfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Pickup negotiation)", status: "planned", meta: "P1 · 4.15.0" },
-    { id: "rider-dropfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Drop-off negotiation)", status: "planned", meta: "P1 · 4.15.0" },
+    { id: "rider-pickfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Pickup negotiation)", status: "planned", meta: "P1 · 4.15.0", rel: [{ to: "common-pick" }] },
+    { id: "rider-dropfb", lane: "rider", col: "scenario", code: null, title: "정차 Fallback 안내 (Drop-off negotiation)", status: "planned", meta: "P1 · 4.15.0", rel: [{ to: "common-drop" }] },
     { id: "rider-usage", lane: "rider", col: "data", code: "3265", title: "이용/혜택내역 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0" },
     { id: "rider-history", lane: "rider", col: "dispatch", code: "3285", title: "검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0" },
 
@@ -683,6 +710,13 @@
         <button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button>
         <span class="meta" data-field="meta">${n.meta}</span>
         ${n.note ? `<span class="note">${n.note}</span>` : ""}
+        ${(n.rel || []).map(r => {
+          const target = data.find(d => d.id === r.to);
+          if (!target) return "";
+          const targetLane = LANES.find(l => l.id === target.lane);
+          const label = target.code ? `#${target.code}` : "미생성";
+          return `<button type="button" class="rel-tag" data-rel-to="${target.id}" style="--rel-color: var(--c-${targetLane.id})">🔗 ${targetLane.tag} ${label}</button>`;
+        }).join("")}
       </div>
     `;
 
@@ -726,6 +760,19 @@
       n.status = next;
       save();
       render();
+    });
+
+    el.querySelectorAll(".rel-tag").forEach(tagEl => {
+      tagEl.addEventListener("click", ev => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const targetEl = grid.querySelector(`[data-id="${tagEl.dataset.relTo}"]`);
+        if (!targetEl) return;
+        targetEl.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        targetEl.classList.remove("rel-flash");
+        void targetEl.offsetWidth;
+        targetEl.classList.add("rel-flash");
+      });
     });
 
     return el;
