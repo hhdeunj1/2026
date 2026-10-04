@@ -483,32 +483,49 @@
     font-style: italic;
   }
 
-  .rel-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 10.5px;
-    font-weight: 700;
-    color: var(--rel-color);
-    background: color-mix(in srgb, var(--rel-color) 16%, transparent);
-    border: 1px solid color-mix(in srgb, var(--rel-color) 45%, transparent);
-    cursor: pointer;
-    padding: 2px 7px;
-    border-radius: 999px;
-    width: fit-content;
-    transition: background 0.15s ease, transform 0.15s ease;
-  }
-  .rel-tag:hover {
-    background: color-mix(in srgb, var(--rel-color) 28%, transparent);
-    transform: translateY(-1px);
-  }
-
   @keyframes relFlash {
     0%, 100% { box-shadow: none; }
     30% { box-shadow: 0 0 0 3px var(--lane-accent); }
   }
   .rel-flash { animation: relFlash 1.1s ease; }
+
+  /* ---- cross-column relationship lines (drawn inside the main grid) ---- */
+
+  .matrix-grid-wrap {
+    position: relative;
+    display: inline-block;
+  }
+
+  .rel-lines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  #relLabels {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .rel-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    cursor: default;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink-dim);
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+  }
 
   .cell-empty {
     font-size: 11px;
@@ -556,7 +573,11 @@
 
   <div class="matrix-shell">
     <div class="matrix-scroll" id="scroll">
-      <div class="matrix-grid" id="grid"></div>
+      <div class="matrix-grid-wrap" id="gridWrap">
+        <div class="matrix-grid" id="grid"></div>
+        <svg class="rel-lines" id="relLines"></svg>
+        <div id="relLabels"></div>
+      </div>
     </div>
   </div>
 
@@ -644,6 +665,102 @@
   }
 
   const grid = document.getElementById("grid");
+  const gridWrap = document.getElementById("gridWrap");
+  const relLinesEl = document.getElementById("relLines");
+  const relLabelsEl = document.getElementById("relLabels");
+
+  const GUTTER_HALF = 7;
+
+  function sideFor(colIdx, otherColIdx) {
+    if (colIdx < otherColIdx) return "right";
+    if (colIdx > otherColIdx) return "left";
+    return colIdx === COLUMNS.length - 1 ? "left" : "right";
+  }
+
+  function edgePoint(el, side, wrapRect) {
+    const rect = el.getBoundingClientRect();
+    const y = rect.top + rect.height / 2 - wrapRect.top;
+    const x = (side === "right" ? rect.right : rect.left) - wrapRect.left;
+    return { x, y };
+  }
+
+  function gutterX(el, side, wrapRect) {
+    const cellRect = el.closest(".cell").getBoundingClientRect();
+    return side === "right"
+      ? cellRect.right - wrapRect.left + GUTTER_HALF
+      : cellRect.left - wrapRect.left - GUTTER_HALF;
+  }
+
+  function arrowPolygonPoints(tipX, tipY, pointingDir) {
+    const s = 5;
+    if (pointingDir === "left") {
+      return `${tipX},${tipY} ${tipX + s},${tipY - s} ${tipX + s},${tipY + s}`;
+    }
+    return `${tipX},${tipY} ${tipX - s},${tipY - s} ${tipX - s},${tipY + s}`;
+  }
+
+  function drawRelLines() {
+    relLinesEl.innerHTML = "";
+    relLabelsEl.innerHTML = "";
+
+    const w = gridWrap.offsetWidth;
+    const h = gridWrap.offsetHeight;
+    relLinesEl.setAttribute("width", w);
+    relLinesEl.setAttribute("height", h);
+    relLinesEl.setAttribute("viewBox", `0 0 ${w} ${h}`);
+
+    const wrapRect = gridWrap.getBoundingClientRect();
+    const seen = new Set();
+
+    data.forEach(n => {
+      (n.rel || []).forEach(r => {
+        const key = [n.id, r.to].sort().join("|");
+        if (seen.has(key)) return;
+        seen.add(key);
+        const target = data.find(d => d.id === r.to);
+        if (!target) return;
+
+        const elA = grid.querySelector(`[data-id="${n.id}"]`);
+        const elB = grid.querySelector(`[data-id="${target.id}"]`);
+        if (!elA || !elB) return;
+
+        const colA = COLUMNS.findIndex(c => c.id === n.col);
+        const colB = COLUMNS.findIndex(c => c.id === target.col);
+        const sideA = sideFor(colA, colB);
+        const sideB = sideFor(colB, colA);
+
+        const ptA = edgePoint(elA, sideA, wrapRect);
+        const ptB = edgePoint(elB, sideB, wrapRect);
+        const gxA = gutterX(elA, sideA, wrapRect);
+        const gxB = gutterX(elB, sideB, wrapRect);
+        const midY = (ptA.y + ptB.y) / 2;
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute(
+          "d",
+          `M ${ptA.x} ${ptA.y} L ${gxA} ${ptA.y} L ${gxA} ${midY} L ${gxB} ${midY} L ${gxB} ${ptB.y} L ${ptB.x} ${ptB.y}`
+        );
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "var(--ink-faint)");
+        path.setAttribute("stroke-width", "1.6");
+        path.setAttribute("stroke-dasharray", "3 5");
+        path.setAttribute("opacity", "0.85");
+        relLinesEl.appendChild(path);
+
+        const arrowDirA = sideA === "right" ? "left" : "right";
+        const arrowA = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        arrowA.setAttribute("points", arrowPolygonPoints(ptA.x, ptA.y, arrowDirA));
+        arrowA.setAttribute("fill", `var(--c-${n.lane})`);
+        relLinesEl.appendChild(arrowA);
+
+        const arrowDirB = sideB === "right" ? "left" : "right";
+        const arrowB = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        arrowB.setAttribute("points", arrowPolygonPoints(ptB.x, ptB.y, arrowDirB));
+        arrowB.setAttribute("fill", `var(--c-${target.lane})`);
+        relLinesEl.appendChild(arrowB);
+      });
+    });
+  }
 
   function render() {
     grid.innerHTML = "";
@@ -684,6 +801,8 @@
         grid.appendChild(cell);
       });
     });
+
+    requestAnimationFrame(drawRelLines);
   }
 
   function renderNode(lane, n) {
@@ -710,13 +829,6 @@
         <button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button>
         <span class="meta" data-field="meta">${n.meta}</span>
         ${n.note ? `<span class="note">${n.note}</span>` : ""}
-        ${(n.rel || []).map(r => {
-          const target = data.find(d => d.id === r.to);
-          if (!target) return "";
-          const targetLane = LANES.find(l => l.id === target.lane);
-          const label = target.code ? `#${target.code}` : "미생성";
-          return `<button type="button" class="rel-tag" data-rel-to="${target.id}" style="--rel-color: var(--c-${targetLane.id})">🔗 ${targetLane.tag} ${label}</button>`;
-        }).join("")}
       </div>
     `;
 
@@ -762,19 +874,6 @@
       render();
     });
 
-    el.querySelectorAll(".rel-tag").forEach(tagEl => {
-      tagEl.addEventListener("click", ev => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        const targetEl = grid.querySelector(`[data-id="${tagEl.dataset.relTo}"]`);
-        if (!targetEl) return;
-        targetEl.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-        targetEl.classList.remove("rel-flash");
-        void targetEl.offsetWidth;
-        targetEl.classList.add("rel-flash");
-      });
-    });
-
     return el;
   }
 
@@ -790,4 +889,6 @@
   });
 
   render();
+  requestAnimationFrame(drawRelLines);
+  window.addEventListener("resize", () => requestAnimationFrame(drawRelLines));
 </script>
