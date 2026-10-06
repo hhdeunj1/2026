@@ -588,7 +588,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = "pudo-map-nodes-v2";
+  const STORAGE_KEY = "pudo-map-nodes-v3";
 
   const REPO = {
     map: "hkmc-airlab/shucle-map-tool-doc",
@@ -650,7 +650,12 @@
   function loadData() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const colIds = new Set(COLUMNS.map(c => c.id));
+        const valid = Array.isArray(parsed) && parsed.length > 0 && parsed.every(n => colIds.has(n.col));
+        if (valid) return parsed;
+      }
     } catch (e) {}
     return JSON.parse(JSON.stringify(DEFAULT_NODES));
   }
