@@ -520,19 +520,9 @@
   /* ---- list view ---- */
 
   .list-shell {
-    border: 1px solid var(--border-soft);
-    border-radius: 16px;
-    background: var(--surface-2);
-    box-shadow: var(--shadow);
-    padding: 6px 0;
-  }
-
-  .list-lane {
-    padding: 14px 20px 10px;
-  }
-
-  .list-lane + .list-lane {
-    border-top: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
   }
 
   .list-lane-head {
@@ -540,46 +530,80 @@
     align-items: baseline;
     gap: 8px;
     margin-bottom: 8px;
+    padding-left: 2px;
   }
 
   .list-lane-head .row-tag { font-size: 13px; }
   .list-lane-head .row-sub { font-size: 11px; }
 
-  .list-rows {
-    display: flex;
-    flex-direction: column;
+  .list-table-wrap {
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    overflow-x: auto;
   }
 
-  .list-row {
-    display: grid;
-    grid-template-columns: 14px 50px 60px 120px 1fr auto;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 6px;
-    color: var(--ink);
-    border-radius: 7px;
+  table.list-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .list-table col.c-drag { width: 20px; }
+  .list-table col.c-col { width: 128px; }
+  .list-table col.c-code { width: 58px; }
+  .list-table col.c-milestone { width: 68px; }
+  .list-table col.c-status { width: 92px; }
+  .list-table col.c-priority { width: 58px; }
+  .list-table col.c-assignee { width: 58px; }
+  .list-table col.c-remark { width: 100px; }
+
+  .list-table thead th {
+    text-align: left;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  .list-table thead th.num,
+  .list-table tbody td.num { text-align: center; }
+
+  .list-table tbody tr {
+    border-bottom: 1px solid var(--border-soft);
     cursor: grab;
     transition: background 0.15s ease;
   }
-  .list-row:hover { background: var(--surface); }
+  .list-table tbody tr:last-child { border-bottom: none; }
+  .list-table tbody tr:hover { background: var(--surface-2); }
 
-  .list-row.off-target { opacity: 0.42; }
-  .list-row.off-target:hover { opacity: 1; }
+  .list-table tbody tr.off-target { opacity: 0.42; }
+  .list-table tbody tr.off-target:hover { opacity: 1; }
 
-  .list-row.dragging { opacity: 0.35; }
-  .list-row.drag-over { outline: 1.5px dashed var(--lane-accent); outline-offset: -2px; }
+  .list-table tbody tr.dragging { opacity: 0.3; }
+  .list-table tbody tr.drag-over td { box-shadow: inset 0 1.5px 0 0 var(--lane-accent), inset 0 -1.5px 0 0 var(--lane-accent); }
+
+  .list-table td {
+    padding: 7px 10px;
+    vertical-align: middle;
+    font-size: 12.4px;
+    color: var(--ink);
+  }
 
   .list-drag-handle {
     color: var(--ink-faint);
     font-size: 11px;
     letter-spacing: -1px;
-    opacity: 0.5;
+    opacity: 0.4;
     user-select: none;
     pointer-events: none;
-  }
-
-  .list-row .tag {
-    justify-self: start;
   }
 
   .list-link {
@@ -587,83 +611,74 @@
     text-decoration: none;
   }
 
-  .list-row .code {
+  td.cell-col {
+    vertical-align: middle;
+    border-right: 1px solid var(--border-soft);
+  }
+
+  .col-select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--lane-accent);
+    background: color-mix(in srgb, var(--lane-accent) 10%, transparent);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 3px 5px;
+    cursor: pointer;
+  }
+  .col-select:hover,
+  .col-select:focus {
+    border-color: var(--lane-accent);
+  }
+
+  td.cell-code {
     font-family: "IBM Plex Mono", monospace;
     font-size: 11.5px;
     color: var(--ink-faint);
+    border-right: 1px solid var(--border-soft);
   }
 
-  .list-col-select {
-    font-family: inherit;
-    font-size: 11px;
-    color: var(--ink-faint);
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 5px;
-    padding: 2px 3px;
-    cursor: pointer;
-    max-width: 120px;
-  }
-  .list-col-select:hover,
-  .list-col-select:focus {
-    background: color-mix(in srgb, var(--lane-accent) 10%, transparent);
-    border-color: var(--border-soft);
-  }
-  .list-col-select.is-repeated { color: transparent; }
-  .list-col-select.is-repeated:hover,
-  .list-col-select.is-repeated:focus { color: var(--ink-faint); }
-
-  .list-row .list-title {
-    font-size: 12.8px;
+  td.cell-title {
     font-weight: 600;
-    line-height: 1.35;
+    line-height: 1.4;
+  }
+
+  .editable-cell {
     cursor: text;
     border-radius: 4px;
-    padding: 1px 3px;
-    margin: 0 -3px;
+    padding: 2px 4px;
+    margin: 0 -4px;
     display: inline-block;
+    min-width: 10px;
   }
-  .list-row .list-title:hover { background: color-mix(in srgb, var(--lane-accent) 10%, transparent); }
-  .list-row .list-title[contenteditable="true"] {
+  .editable-cell:hover { background: color-mix(in srgb, var(--lane-accent) 10%, transparent); }
+  .editable-cell[contenteditable="true"] {
     background: var(--surface);
     outline: 1.5px dashed var(--lane-accent);
   }
-
-  .list-status-meta {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    justify-self: end;
+  .editable-cell:empty::before {
+    content: "—";
+    color: var(--ink-faint);
   }
 
-  .status-dot {
-    width: 9px;
-    height: 9px;
-    flex: none;
-    border-radius: 50%;
-    border: none;
-    padding: 0;
-    cursor: pointer;
+  td.cell-milestone,
+  td.cell-priority,
+  td.cell-assignee {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-dim);
   }
-  .status-dot.progress { background: var(--status-progress); }
-  .status-dot.fixed { background: var(--status-fixed); }
-  .status-dot.icebox { background: var(--status-icebox); }
-  .status-dot.inbox { background: var(--status-inbox); }
-  .status-dot.planned { background: transparent; border: 1.5px dashed var(--ink-faint); }
 
-  .list-row .meta {
-    font-size: 10.8px;
-    text-align: right;
-    cursor: text;
-    border-radius: 4px;
-    padding: 1px 3px;
-    margin: 0 -3px;
+  td.cell-remark {
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    font-style: italic;
   }
-  .list-row .meta:hover { background: color-mix(in srgb, var(--lane-accent) 10%, transparent); }
-  .list-row .meta[contenteditable="true"] {
-    background: var(--surface);
-    outline: 1.5px dashed var(--lane-accent);
-  }
+
+  td.cell-status { white-space: nowrap; }
+  td.cell-status .status { font-size: 10.5px; }
 
   footer.foot {
     margin-top: 18px;
@@ -700,7 +715,6 @@
         <button type="button" class="view-btn" data-view="list">리스트</button>
       </div>
       <span class="save-state" id="saveState">저장됨</span>
-      <button class="btn" id="copyBtn">JSON 복사</button>
     </div>
   </header>
 
@@ -710,9 +724,7 @@
     </div>
   </div>
 
-  <div class="list-shell" id="listView" hidden>
-    <div class="list" id="list"></div>
-  </div>
+  <div class="list-shell" id="listView" hidden></div>
 
   <footer class="foot">
     <span class="k">2026-10-07</span>
@@ -721,7 +733,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = "pudo-map-nodes-v5";
+  const STORAGE_KEY = "pudo-map-nodes-v6";
 
   const REPO = {
     map: "hkmc-airlab/shucle-map-tool-doc",
@@ -747,37 +759,37 @@
   ];
 
   const DEFAULT_NODES = [
-    { id: "map-blacklist", lane: "map", col: "a", code: "532", title: "승하차 지점(주정차 불가) 관리 기능", status: "progress", meta: "High · 4.14.0 · 애란" },
-    { id: "map-hae-view", lane: "map", col: "a", code: "545", title: "HAE 데이터 연동 협의 및 뷰어 레이어 1차 개발", status: "progress", meta: "High · 4.14.0 · 애란" },
-    { id: "map-hae-block", lane: "map", col: "a", code: "546", title: "HAE 데이터 차단 데이터로 사용", status: "inbox", meta: "P2 · 4.15.0 · 애란" },
-    { id: "map-whitelist", lane: "map", col: "a", code: "537", title: "앱 PuDo 데이터 연동", status: "inbox", meta: "P1 · 4.15.0 · 애란" },
-    { id: "map-zonecheck", lane: "map", col: "a", code: "569", title: "푸도 가능 영역 확인 기능 추가", status: "inbox", meta: "P3 · 4.15.0 · 애란" },
-    { id: "map-usecheck", lane: "map", col: "b", code: "571", title: "영역 PuDo 사용 여부 체크 옵션 추가", status: "icebox", meta: "4.16.0 · 애란" },
-    { id: "map-gap", lane: "map", col: "b", code: "572", title: "도로 이격 발생 시 블랙리스트 데이터 처리", status: "icebox", meta: "4.16.0 · 애란" },
-    { id: "map-points", lane: "map", col: "b", code: "536", title: "PuDo Points 관리 기능", status: "icebox", meta: "P2 · 미정 · 애란" },
+    { id: "map-blacklist", lane: "map", col: "a", code: "532", title: "승하차 지점(주정차 불가) 관리 기능", status: "progress", priority: "High", milestone: "4.14.0", assignee: "애란", remark: "" },
+    { id: "map-hae-view", lane: "map", col: "a", code: "545", title: "HAE 데이터 연동 협의 및 뷰어 레이어 1차 개발", status: "progress", priority: "High", milestone: "4.14.0", assignee: "애란", remark: "" },
+    { id: "map-hae-block", lane: "map", col: "a", code: "546", title: "HAE 데이터 차단 데이터로 사용", status: "inbox", priority: "P2", milestone: "4.15.0", assignee: "애란", remark: "" },
+    { id: "map-whitelist", lane: "map", col: "a", code: "537", title: "앱 PuDo 데이터 연동", status: "inbox", priority: "P1", milestone: "4.15.0", assignee: "애란", remark: "" },
+    { id: "map-zonecheck", lane: "map", col: "a", code: "569", title: "푸도 가능 영역 확인 기능 추가", status: "inbox", priority: "P3", milestone: "4.15.0", assignee: "애란", remark: "" },
+    { id: "map-usecheck", lane: "map", col: "b", code: "571", title: "영역 PuDo 사용 여부 체크 옵션 추가", status: "icebox", priority: "", milestone: "4.16.0", assignee: "애란", remark: "" },
+    { id: "map-gap", lane: "map", col: "b", code: "572", title: "도로 이격 발생 시 블랙리스트 데이터 처리", status: "icebox", priority: "", milestone: "4.16.0", assignee: "애란", remark: "" },
+    { id: "map-points", lane: "map", col: "b", code: "536", title: "PuDo Points 관리 기능", status: "icebox", priority: "P2", milestone: "미정", assignee: "애란", remark: "" },
 
-    { id: "common-a", lane: "common", col: "a", code: "3241", repo: "rider", title: "데이터 구조 및 관리 정책", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 맵툴 #537, #569" },
-    { id: "common-b", lane: "common", col: "b", code: "3269", repo: "rider", title: "PUDO 운영 및 고도화 (정차 데이터 활용 등)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 맵툴 #536, #571, #572 · 라앱 #3270" },
-    { id: "common-c", lane: "common", col: "c", code: null, title: "AV 호출 시나리오 및 배차 정책", status: "planned", meta: "P1 · 4.15.0", note: "cf. 라앱 #3242, #3286, #3238" },
-    { id: "common-d-pick", lane: "common", col: "d", code: "3239", repo: "rider", title: "Pick 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3289 · 드앱 #1028" },
-    { id: "common-d-drop", lane: "common", col: "d", code: "3240", repo: "rider", title: "Drop 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3290 · 드앱 #1028" },
-    { id: "common-d-drive", lane: "common", col: "d", code: "3268", repo: "rider", title: "주행 Fallback 시나리오 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 라앱 #3292 · 드앱 #1036" },
+    { id: "common-a", lane: "common", col: "a", code: "3241", repo: "rider", title: "데이터 구조 및 관리 정책", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "이관예정", note: "cf. 맵툴 #537, #569" },
+    { id: "common-b", lane: "common", col: "b", code: "3269", repo: "rider", title: "PUDO 운영 및 고도화 (정차 데이터 활용 등)", status: "inbox", priority: "P1", milestone: "미정", assignee: "은지", remark: "이관예정", note: "cf. 맵툴 #536, #571, #572 · 라앱 #3270" },
+    { id: "common-c", lane: "common", col: "c", code: null, title: "AV 호출 시나리오 및 배차 정책", status: "planned", priority: "P1", milestone: "4.15.0", assignee: "", remark: "", note: "cf. 라앱 #3242, #3286, #3238" },
+    { id: "common-d-pick", lane: "common", col: "d", code: "3239", repo: "rider", title: "Pick 정차 Fallback 시나리오", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "이관예정", note: "cf. 라앱 #3289 · 드앱 #1028" },
+    { id: "common-d-drop", lane: "common", col: "d", code: "3240", repo: "rider", title: "Drop 정차 Fallback 시나리오", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "이관예정", note: "cf. 라앱 #3290 · 드앱 #1028" },
+    { id: "common-d-drive", lane: "common", col: "d", code: "3268", repo: "rider", title: "주행 Fallback 시나리오 (P/D 포함 도로 진입 불가)", status: "inbox", priority: "P1", milestone: "미정", assignee: "은지", remark: "이관예정", note: "cf. 라앱 #3292 · 드앱 #1036" },
 
-    { id: "rider-log", lane: "rider", col: "b", code: "3270", title: "정차 로그 스키마 정의", status: "fixed", meta: "P1 · 4.15.0 · 은지" },
-    { id: "rider-dispatch", lane: "rider", col: "c", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", meta: "P1 · 4.15.0 · 은지" },
-    { id: "rider-point", lane: "rider", col: "c", code: "3286", title: "PUDO Point 노출 로직", status: "progress", meta: "P1 · 4.15.0 · 은지" },
-    { id: "rider-ux", lane: "rider", col: "c", code: "3238", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0 · 희원" },
-    { id: "rider-history", lane: "rider", col: "c", code: "3285", title: "메뉴 홈 > 검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0 · 희원" },
-    { id: "rider-search", lane: "rider", col: "c", code: "3227", title: "통합검색 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0 · 영연" },
-    { id: "rider-quick", lane: "rider", col: "c", code: "3228", title: "빠른호출 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0 · 영연" },
-    { id: "rider-usage", lane: "rider", col: "c", code: "3265", title: "이용/혜택내역 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0 · 차경" },
-    { id: "rider-nego-pickup", lane: "rider", col: "d", code: "3289", title: "정차 Negotiation 안내 (Pickup)", status: "progress", meta: "P1 · 4.15.0 · 희원" },
-    { id: "rider-nego-dropoff", lane: "rider", col: "d", code: "3290", title: "정차 Negotiation 안내 (Drop-off)", status: "progress", meta: "P1 · 4.15.0 · 희원" },
-    { id: "rider-nego-push", lane: "rider", col: "d", code: "3291", title: "정차 Negotiation 안내 앱푸시 (Pickup/Drop-off)", status: "progress", meta: "P1 · 4.15.0 · 차경" },
-    { id: "rider-nego-drive", lane: "rider", col: "d", code: "3292", title: "주행 Fallback 안내 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지" },
+    { id: "rider-log", lane: "rider", col: "b", code: "3270", title: "정차 로그 스키마 정의", status: "fixed", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "" },
+    { id: "rider-dispatch", lane: "rider", col: "c", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "" },
+    { id: "rider-point", lane: "rider", col: "c", code: "3286", title: "PUDO Point 노출 로직", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "" },
+    { id: "rider-ux", lane: "rider", col: "c", code: "3238", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "희원", remark: "" },
+    { id: "rider-history", lane: "rider", col: "c", code: "3285", title: "메뉴 홈 > 검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "희원", remark: "" },
+    { id: "rider-search", lane: "rider", col: "c", code: "3227", title: "통합검색 D2D AV 가호출 노출/플로우", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "영연", remark: "" },
+    { id: "rider-quick", lane: "rider", col: "c", code: "3228", title: "빠른호출 D2D AV 가호출 노출/플로우", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "영연", remark: "" },
+    { id: "rider-usage", lane: "rider", col: "c", code: "3265", title: "이용/혜택내역 > 운행 정보 데이터 정의", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "차경", remark: "" },
+    { id: "rider-nego-pickup", lane: "rider", col: "d", code: "3289", title: "정차 Negotiation 안내 (Pickup)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "희원", remark: "" },
+    { id: "rider-nego-dropoff", lane: "rider", col: "d", code: "3290", title: "정차 Negotiation 안내 (Drop-off)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "희원", remark: "" },
+    { id: "rider-nego-push", lane: "rider", col: "d", code: "3291", title: "정차 Negotiation 안내 앱푸시 (Pickup/Drop-off)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "차경", remark: "" },
+    { id: "rider-nego-drive", lane: "rider", col: "d", code: "3292", title: "주행 Fallback 안내 (P/D 포함 도로 진입 불가)", status: "inbox", priority: "P1", milestone: "미정", assignee: "은지", remark: "" },
 
-    { id: "driver-stop", lane: "driver", col: "d", code: "1028", title: "정차 위치 변경/실패 안내", status: "progress", meta: "P1 · 4.15.0 · 윤아" },
-    { id: "driver-drive", lane: "driver", col: "d", code: "1036", title: "도로 진입 불가 시 안내", status: "inbox", meta: "P1 · 미정 · 윤아" },
+    { id: "driver-stop", lane: "driver", col: "d", code: "1028", title: "정차 위치 변경/실패 안내", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "윤아", remark: "" },
+    { id: "driver-drive", lane: "driver", col: "d", code: "1036", title: "도로 진입 불가 시 안내", status: "inbox", priority: "P1", milestone: "미정", assignee: "윤아", remark: "" },
   ];
 
   const STATUS_LABEL = { progress: "진행중", fixed: "스펙확정", icebox: "아이스박스", inbox: "인박스", planned: "미생성" };
@@ -804,8 +816,13 @@
     saveStateEl.textContent = "저장됨 · " + new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
   }
 
-  function isOffTarget(meta) {
-    return !meta.includes("4.15.0") && !meta.includes("4.14.0");
+  function isOffTarget(n) {
+    const m = n.milestone || "";
+    return !m.includes("4.15.0") && !m.includes("4.14.0");
+  }
+
+  function metaText(n) {
+    return [n.priority, n.milestone, n.assignee, n.remark].filter(Boolean).join(" · ");
   }
 
   const grid = document.getElementById("grid");
@@ -860,7 +877,7 @@
     }
     el.className = "node"
       + (n.status === "planned" ? " is-planned" : "")
-      + (isOffTarget(n.meta) ? " off-target" : "");
+      + (isOffTarget(n) ? " off-target" : "");
     el.dataset.id = n.id;
 
     const codeHtml = n.code ? `<span class="code">#${n.code}</span>` : `<span class="code">미생성</span>`;
@@ -873,13 +890,12 @@
       <p class="node-title" data-field="title">${n.title}</p>
       <div class="node-bottom">
         <button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button>
-        <span class="meta" data-field="meta">${n.meta}</span>
+        <span class="meta">${metaText(n)}</span>
         ${n.note ? `<span class="note">${n.note}</span>` : ""}
       </div>
     `;
 
     const titleEl = el.querySelector('[data-field="title"]');
-    const metaEl = el.querySelector('[data-field="meta"]');
     const statusEl = el.querySelector('[data-field="status"]');
 
     function makeEditable(fieldEl, key) {
@@ -899,7 +915,6 @@
         if (val && val !== n[key]) {
           n[key] = val;
           save();
-          if (key === "meta") render();
         }
       });
       fieldEl.addEventListener("keydown", ev => {
@@ -909,7 +924,6 @@
     }
 
     makeEditable(titleEl, "title");
-    makeEditable(metaEl, "meta");
 
     statusEl.addEventListener("click", ev => {
       ev.preventDefault();
@@ -923,7 +937,7 @@
     return el;
   }
 
-  const listEl = document.getElementById("list");
+  const listEl = document.getElementById("listView");
   let dragSrcId = null;
 
   function makeListEditable(fieldEl, n, key) {
@@ -940,7 +954,7 @@
     fieldEl.addEventListener("blur", () => {
       fieldEl.contentEditable = "false";
       const val = fieldEl.textContent.trim();
-      if (val && val !== n[key]) {
+      if (val !== n[key]) {
         n[key] = val;
         save();
         render();
@@ -970,14 +984,39 @@
       head.innerHTML = `<span class="row-tag">${lane.label}</span><span class="row-sub">${lane.sub}</span>`;
       section.appendChild(head);
 
-      const rows = document.createElement("div");
-      rows.className = "list-rows";
+      const wrap = document.createElement("div");
+      wrap.className = "list-table-wrap";
+
+      const table = document.createElement("table");
+      table.className = "list-table";
+      table.innerHTML = `
+        <colgroup>
+          <col class="c-drag"><col class="c-col"><col class="c-code">
+          <col><col class="c-milestone"><col class="c-status">
+          <col class="c-priority"><col class="c-assignee"><col class="c-remark">
+        </colgroup>
+        <thead>
+          <tr>
+            <th></th>
+            <th>분류</th>
+            <th class="num">이슈</th>
+            <th>기능</th>
+            <th>마일스톤</th>
+            <th>상태</th>
+            <th class="num">우선순위</th>
+            <th class="num">담당자</th>
+            <th>비고</th>
+          </tr>
+        </thead>
+      `;
+
+      const tbody = document.createElement("tbody");
 
       let prevCol = null;
 
       items.forEach(n => {
-        const row = document.createElement("div");
-        row.className = "list-row" + (isOffTarget(n.meta) ? " off-target" : "");
+        const row = document.createElement("tr");
+        row.className = isOffTarget(n) ? "off-target" : "";
         row.dataset.lane = lane.id;
         row.dataset.id = n.id;
         row.draggable = true;
@@ -985,8 +1024,8 @@
         const linkHref = n.code ? `https://github.com/${REPO[n.repo || lane.id]}/issues/${n.code}` : null;
         const codeInner = n.code ? `#${n.code}` : "미생성";
         const codeHtml = linkHref
-          ? `<a class="list-link code" href="${linkHref}" target="_blank" rel="noopener">${codeInner}</a>`
-          : `<span class="code">${codeInner}</span>`;
+          ? `<a class="list-link" href="${linkHref}" target="_blank" rel="noopener">${codeInner}</a>`
+          : codeInner;
 
         const sameAsPrev = n.col === prevCol;
         prevCol = n.col;
@@ -996,25 +1035,22 @@
         ).join("");
 
         row.innerHTML = `
-          <span class="list-drag-handle">⠿</span>
-          <span class="tag">${lane.tag}</span>
-          ${codeHtml}
-          <select class="list-col-select${sameAsPrev ? " is-repeated" : ""}" data-field="col">${colOptions}</select>
-          <span class="list-title" data-field="title">${n.title}</span>
-          <span class="list-status-meta">
-            <button type="button" class="status-dot ${n.status}" data-field="status" title="${STATUS_LABEL[n.status]}"></button>
-            <span class="meta" data-field="meta">${n.meta}</span>
-          </span>
+          <td class="list-drag-handle">⠿</td>
+          <td class="cell-col">${sameAsPrev ? "" : `<select class="col-select" data-field="col">${colOptions}</select>`}</td>
+          <td class="cell-code">${codeHtml}</td>
+          <td class="cell-title"><span class="editable-cell" data-field="title">${n.title}</span></td>
+          <td class="cell-milestone"><span class="editable-cell" data-field="milestone">${n.milestone || ""}</span></td>
+          <td class="cell-status"><button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button></td>
+          <td class="cell-priority num"><span class="editable-cell" data-field="priority">${n.priority || ""}</span></td>
+          <td class="cell-assignee num"><span class="editable-cell" data-field="assignee">${n.assignee || ""}</span></td>
+          <td class="cell-remark"><span class="editable-cell" data-field="remark">${n.remark || ""}</span></td>
         `;
 
-        const titleEl = row.querySelector('[data-field="title"]');
-        const metaEl = row.querySelector('[data-field="meta"]');
+        ["title", "milestone", "priority", "assignee", "remark"].forEach(key => {
+          makeListEditable(row.querySelector(`[data-field="${key}"]`), n, key);
+        });
+
         const statusEl = row.querySelector('[data-field="status"]');
-        const colEl = row.querySelector('[data-field="col"]');
-
-        makeListEditable(titleEl, n, "title");
-        makeListEditable(metaEl, n, "meta");
-
         statusEl.addEventListener("click", ev => {
           ev.preventDefault();
           ev.stopPropagation();
@@ -1025,13 +1061,16 @@
           renderList();
         });
 
-        colEl.addEventListener("click", ev => ev.stopPropagation());
-        colEl.addEventListener("change", () => {
-          n.col = colEl.value;
-          save();
-          render();
-          renderList();
-        });
+        const colEl = row.querySelector('[data-field="col"]');
+        if (colEl) {
+          colEl.addEventListener("click", ev => ev.stopPropagation());
+          colEl.addEventListener("change", () => {
+            n.col = colEl.value;
+            save();
+            render();
+            renderList();
+          });
+        }
 
         row.addEventListener("dragstart", ev => {
           dragSrcId = n.id;
@@ -1040,7 +1079,7 @@
         });
         row.addEventListener("dragend", () => {
           row.classList.remove("dragging");
-          rows.querySelectorAll(".list-row.drag-over").forEach(r => r.classList.remove("drag-over"));
+          tbody.querySelectorAll("tr.drag-over").forEach(r => r.classList.remove("drag-over"));
         });
         row.addEventListener("dragover", ev => {
           if (dragSrcId === null || dragSrcId === n.id) return;
@@ -1068,10 +1107,12 @@
           renderList();
         });
 
-        rows.appendChild(row);
+        tbody.appendChild(row);
       });
 
-      section.appendChild(rows);
+      table.appendChild(tbody);
+      wrap.appendChild(table);
+      section.appendChild(wrap);
       listEl.appendChild(section);
     });
   }
@@ -1088,17 +1129,6 @@
     boardViewEl.hidden = currentView !== "board";
     listViewEl.hidden = currentView !== "list";
     if (currentView === "list") renderList();
-  });
-
-  document.getElementById("copyBtn").addEventListener("click", async () => {
-    const btn = document.getElementById("copyBtn");
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-      btn.textContent = "복사됨!";
-    } catch (e) {
-      btn.textContent = "복사 실패";
-    }
-    setTimeout(() => { btn.textContent = "JSON 복사"; }, 1600);
   });
 
   render();
