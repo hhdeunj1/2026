@@ -552,22 +552,39 @@
 
   .list-row {
     display: grid;
-    grid-template-columns: 50px 60px 1fr 150px 86px 160px;
+    grid-template-columns: 14px 50px 60px 120px 1fr auto;
     align-items: center;
     gap: 10px;
     padding: 7px 6px;
-    text-decoration: none;
     color: var(--ink);
     border-radius: 7px;
+    cursor: grab;
     transition: background 0.15s ease;
   }
-  a.list-row:hover { background: var(--surface); }
+  .list-row:hover { background: var(--surface); }
 
   .list-row.off-target { opacity: 0.42; }
   .list-row.off-target:hover { opacity: 1; }
 
+  .list-row.dragging { opacity: 0.35; }
+  .list-row.drag-over { outline: 1.5px dashed var(--lane-accent); outline-offset: -2px; }
+
+  .list-drag-handle {
+    color: var(--ink-faint);
+    font-size: 11px;
+    letter-spacing: -1px;
+    opacity: 0.5;
+    user-select: none;
+    pointer-events: none;
+  }
+
   .list-row .tag {
     justify-self: start;
+  }
+
+  .list-link {
+    color: inherit;
+    text-decoration: none;
   }
 
   .list-row .code {
@@ -576,30 +593,76 @@
     color: var(--ink-faint);
   }
 
+  .list-col-select {
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--ink-faint);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 2px 3px;
+    cursor: pointer;
+    max-width: 120px;
+  }
+  .list-col-select:hover,
+  .list-col-select:focus {
+    background: color-mix(in srgb, var(--lane-accent) 10%, transparent);
+    border-color: var(--border-soft);
+  }
+  .list-col-select.is-repeated { color: transparent; }
+  .list-col-select.is-repeated:hover,
+  .list-col-select.is-repeated:focus { color: var(--ink-faint); }
+
   .list-row .list-title {
     font-size: 12.8px;
     font-weight: 600;
     line-height: 1.35;
+    cursor: text;
+    border-radius: 4px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+    display: inline-block;
+  }
+  .list-row .list-title:hover { background: color-mix(in srgb, var(--lane-accent) 10%, transparent); }
+  .list-row .list-title[contenteditable="true"] {
+    background: var(--surface);
+    outline: 1.5px dashed var(--lane-accent);
   }
 
-  .list-row .list-note {
-    font-size: 10.8px;
-    color: var(--ink-faint);
-    font-style: italic;
-    display: block;
-    font-weight: 400;
+  .list-status-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-self: end;
   }
 
-  .list-row .list-col {
-    font-size: 11px;
-    color: var(--ink-faint);
+  .status-dot {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    cursor: pointer;
   }
+  .status-dot.progress { background: var(--status-progress); }
+  .status-dot.fixed { background: var(--status-fixed); }
+  .status-dot.icebox { background: var(--status-icebox); }
+  .status-dot.inbox { background: var(--status-inbox); }
+  .status-dot.planned { background: transparent; border: 1.5px dashed var(--ink-faint); }
 
   .list-row .meta {
     font-size: 10.8px;
-    justify-self: end;
     text-align: right;
-    cursor: default;
+    cursor: text;
+    border-radius: 4px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+  }
+  .list-row .meta:hover { background: color-mix(in srgb, var(--lane-accent) 10%, transparent); }
+  .list-row .meta[contenteditable="true"] {
+    background: var(--surface);
+    outline: 1.5px dashed var(--lane-accent);
   }
 
   footer.foot {
@@ -673,6 +736,8 @@
     { id: "rider", label: "라이더앱", sub: "승객 UX", tag: "라앱" },
     { id: "driver", label: "드라이버앱", sub: "기사 UX", tag: "드앱" },
   ];
+
+  const LIST_LANE_ORDER = ["common", "map", "rider", "driver"];
 
   const COLUMNS = [
     { id: "a", label: "A. PUDO 구축" },
@@ -859,13 +924,41 @@
   }
 
   const listEl = document.getElementById("list");
+  let dragSrcId = null;
+
+  function makeListEditable(fieldEl, n, key) {
+    fieldEl.addEventListener("dblclick", ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      fieldEl.contentEditable = "true";
+      fieldEl.focus();
+      document.execCommand("selectAll", false, null);
+    });
+    fieldEl.addEventListener("click", ev => {
+      if (fieldEl.contentEditable === "true") ev.preventDefault();
+    });
+    fieldEl.addEventListener("blur", () => {
+      fieldEl.contentEditable = "false";
+      const val = fieldEl.textContent.trim();
+      if (val && val !== n[key]) {
+        n[key] = val;
+        save();
+        render();
+        renderList();
+      }
+    });
+    fieldEl.addEventListener("keydown", ev => {
+      if (ev.key === "Enter") { ev.preventDefault(); fieldEl.blur(); }
+      if (ev.key === "Escape") { fieldEl.textContent = n[key]; fieldEl.blur(); }
+    });
+  }
 
   function renderList() {
     listEl.innerHTML = "";
-    const colLabel = Object.fromEntries(COLUMNS.map(c => [c.id, c.label.replace(/^[A-Z]\.\s*/, "")]));
 
-    LANES.forEach(lane => {
-      const items = data.filter(n => n.lane === lane.id);
+    LIST_LANE_ORDER.forEach(laneId => {
+      const lane = LANES.find(l => l.id === laneId);
+      const items = data.filter(n => n.lane === laneId);
       if (!items.length) return;
 
       const section = document.createElement("div");
@@ -874,39 +967,102 @@
 
       const head = document.createElement("div");
       head.className = "list-lane-head";
-      head.innerHTML = `<span class="row-tag">${lane.label}</span><span class="row-sub">${lane.sub} · ${items.length}건</span>`;
+      head.innerHTML = `<span class="row-tag">${lane.label}</span><span class="row-sub">${lane.sub}</span>`;
       section.appendChild(head);
 
       const rows = document.createElement("div");
       rows.className = "list-rows";
 
+      let prevCol = null;
+
       items.forEach(n => {
-        const row = document.createElement(n.code ? "a" : "div");
-        if (n.code) {
-          row.href = `https://github.com/${REPO[n.repo || lane.id]}/issues/${n.code}`;
-          row.target = "_blank";
-          row.rel = "noopener";
-        }
+        const row = document.createElement("div");
         row.className = "list-row" + (isOffTarget(n.meta) ? " off-target" : "");
         row.dataset.lane = lane.id;
+        row.dataset.id = n.id;
+        row.draggable = true;
 
-        const codeHtml = n.code ? `#${n.code}` : "미생성";
+        const linkHref = n.code ? `https://github.com/${REPO[n.repo || lane.id]}/issues/${n.code}` : null;
+        const codeInner = n.code ? `#${n.code}` : "미생성";
+        const codeHtml = linkHref
+          ? `<a class="list-link code" href="${linkHref}" target="_blank" rel="noopener">${codeInner}</a>`
+          : `<span class="code">${codeInner}</span>`;
+
+        const sameAsPrev = n.col === prevCol;
+        prevCol = n.col;
+
+        const colOptions = COLUMNS.map(c =>
+          `<option value="${c.id}" ${c.id === n.col ? "selected" : ""}>${c.label.replace(/^[A-Z]\.\s*/, "")}</option>`
+        ).join("");
 
         row.innerHTML = `
+          <span class="list-drag-handle">⠿</span>
           <span class="tag">${lane.tag}</span>
-          <span class="code">${codeHtml}</span>
-          <span class="list-title">${n.title}${n.note ? `<span class="list-note">${n.note}</span>` : ""}</span>
-          <span class="list-col">${colLabel[n.col] || ""}</span>
-          <button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button>
-          <span class="meta">${n.meta}</span>
+          ${codeHtml}
+          <select class="list-col-select${sameAsPrev ? " is-repeated" : ""}" data-field="col">${colOptions}</select>
+          <span class="list-title" data-field="title">${n.title}</span>
+          <span class="list-status-meta">
+            <button type="button" class="status-dot ${n.status}" data-field="status" title="${STATUS_LABEL[n.status]}"></button>
+            <span class="meta" data-field="meta">${n.meta}</span>
+          </span>
         `;
 
+        const titleEl = row.querySelector('[data-field="title"]');
+        const metaEl = row.querySelector('[data-field="meta"]');
         const statusEl = row.querySelector('[data-field="status"]');
+        const colEl = row.querySelector('[data-field="col"]');
+
+        makeListEditable(titleEl, n, "title");
+        makeListEditable(metaEl, n, "meta");
+
         statusEl.addEventListener("click", ev => {
           ev.preventDefault();
           ev.stopPropagation();
           const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(n.status) + 1) % STATUS_CYCLE.length];
           n.status = next;
+          save();
+          render();
+          renderList();
+        });
+
+        colEl.addEventListener("click", ev => ev.stopPropagation());
+        colEl.addEventListener("change", () => {
+          n.col = colEl.value;
+          save();
+          render();
+          renderList();
+        });
+
+        row.addEventListener("dragstart", ev => {
+          dragSrcId = n.id;
+          row.classList.add("dragging");
+          ev.dataTransfer.effectAllowed = "move";
+        });
+        row.addEventListener("dragend", () => {
+          row.classList.remove("dragging");
+          rows.querySelectorAll(".list-row.drag-over").forEach(r => r.classList.remove("drag-over"));
+        });
+        row.addEventListener("dragover", ev => {
+          if (dragSrcId === null || dragSrcId === n.id) return;
+          const srcNode = data.find(d => d.id === dragSrcId);
+          if (!srcNode || srcNode.lane !== n.lane) return;
+          ev.preventDefault();
+          row.classList.add("drag-over");
+        });
+        row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+        row.addEventListener("drop", ev => {
+          ev.preventDefault();
+          row.classList.remove("drag-over");
+          if (dragSrcId === null || dragSrcId === n.id) return;
+          const srcIdx = data.findIndex(d => d.id === dragSrcId);
+          const targetIdx = data.findIndex(d => d.id === n.id);
+          if (srcIdx === -1 || targetIdx === -1) return;
+          const srcNode = data[srcIdx];
+          if (srcNode.lane !== n.lane) return;
+          data.splice(srcIdx, 1);
+          const newTargetIdx = data.findIndex(d => d.id === n.id);
+          data.splice(newTargetIdx, 0, srcNode);
+          dragSrcId = null;
           save();
           render();
           renderList();
