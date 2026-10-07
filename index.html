@@ -483,50 +483,6 @@
     font-style: italic;
   }
 
-  @keyframes relFlash {
-    0%, 100% { box-shadow: none; }
-    30% { box-shadow: 0 0 0 3px var(--lane-accent); }
-  }
-  .rel-flash { animation: relFlash 1.1s ease; }
-
-  /* ---- cross-column relationship lines (drawn inside the main grid) ---- */
-
-  .matrix-grid-wrap {
-    position: relative;
-    display: inline-block;
-  }
-
-  .rel-lines {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 4;
-  }
-
-  #relLabels {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 5;
-  }
-
-  .rel-label {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    pointer-events: auto;
-    cursor: default;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 3px 10px;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--ink-dim);
-    white-space: nowrap;
-    box-shadow: var(--shadow);
-  }
-
   .cell-empty {
     font-size: 11px;
     color: var(--ink-faint);
@@ -570,11 +526,7 @@
 
   <div class="matrix-shell">
     <div class="matrix-scroll" id="scroll">
-      <div class="matrix-grid-wrap" id="gridWrap">
-        <div class="matrix-grid" id="grid"></div>
-        <svg class="rel-lines" id="relLines"></svg>
-        <div id="relLabels"></div>
-      </div>
+      <div class="matrix-grid" id="grid"></div>
     </div>
   </div>
 
@@ -618,17 +570,17 @@
     { id: "map-gap", lane: "map", col: "b", code: "572", title: "도로 이격 발생 시 블랙리스트 데이터 처리", status: "icebox", meta: "4.16.0 · 애란" },
     { id: "map-points", lane: "map", col: "b", code: "536", title: "PuDo Points 관리 기능", status: "icebox", meta: "P2 · 미정 · 애란" },
 
-    { id: "common-a", lane: "common", col: "a", code: "3241", repo: "rider", title: "데이터 구조 및 관리 정책", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 맵툴 #537, #569", rel: [{ to: "map-whitelist" }] },
-    { id: "common-b", lane: "common", col: "b", code: "3269", repo: "rider", title: "PUDO 운영 및 고도화 (정차 데이터 활용 등)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 맵툴 #536, #571, #572 · 라앱 #3270", rel: [{ to: "rider-log" }] },
-    { id: "common-c", lane: "common", col: "c", code: null, title: "AV 호출 시나리오 및 배차 정책", status: "planned", meta: "P1 · 4.15.0", note: "cf. 라앱 #3242, #3286, #3238", rel: [{ to: "rider-dispatch" }] },
-    { id: "common-d-pick", lane: "common", col: "d", code: "3239", repo: "rider", title: "Pick 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3289 · 드앱 #1028", rel: [{ to: "rider-nego-pickup" }, { to: "driver-stop" }] },
-    { id: "common-d-drop", lane: "common", col: "d", code: "3240", repo: "rider", title: "Drop 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3290 · 드앱 #1028", rel: [{ to: "rider-nego-dropoff" }, { to: "driver-stop" }] },
-    { id: "common-d-drive", lane: "common", col: "d", code: "3268", repo: "rider", title: "주행 Fallback 시나리오 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 라앱 #3292 · 드앱 미생성", rel: [{ to: "rider-nego-drive" }, { to: "driver-drive" }] },
+    { id: "common-a", lane: "common", col: "a", code: "3241", repo: "rider", title: "데이터 구조 및 관리 정책", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 맵툴 #537, #569" },
+    { id: "common-b", lane: "common", col: "b", code: "3269", repo: "rider", title: "PUDO 운영 및 고도화 (정차 데이터 활용 등)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 맵툴 #536, #571, #572 · 라앱 #3270" },
+    { id: "common-c", lane: "common", col: "c", code: null, title: "AV 호출 시나리오 및 배차 정책", status: "planned", meta: "P1 · 4.15.0", note: "cf. 라앱 #3242, #3286, #3238" },
+    { id: "common-d-pick", lane: "common", col: "d", code: "3239", repo: "rider", title: "Pick 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3289 · 드앱 #1028" },
+    { id: "common-d-drop", lane: "common", col: "d", code: "3240", repo: "rider", title: "Drop 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3290 · 드앱 #1028" },
+    { id: "common-d-drive", lane: "common", col: "d", code: "3268", repo: "rider", title: "주행 Fallback 시나리오 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 라앱 #3292 · 드앱 미생성" },
 
     { id: "rider-log", lane: "rider", col: "b", code: "3270", title: "정차 로그 스키마 정의", status: "fixed", meta: "P1 · 4.15.0 · 은지" },
     { id: "rider-dispatch", lane: "rider", col: "c", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", meta: "P1 · 4.15.0 · 은지" },
     { id: "rider-point", lane: "rider", col: "c", code: "3286", title: "PUDO Point 노출 로직", status: "progress", meta: "P1 · 4.15.0 · 은지" },
-    { id: "rider-ux", lane: "rider", col: "c", code: "3238", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0 · 희원", rel: [{ to: "rider-search" }, { to: "rider-quick" }] },
+    { id: "rider-ux", lane: "rider", col: "c", code: "3238", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0 · 희원" },
     { id: "rider-history", lane: "rider", col: "c", code: "3285", title: "메뉴 홈 > 검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0 · 희원" },
     { id: "rider-search", lane: "rider", col: "c", code: "3227", title: "통합검색 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0 · 영연" },
     { id: "rider-quick", lane: "rider", col: "c", code: "3228", title: "빠른호출 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0 · 영연" },
@@ -671,134 +623,6 @@
   }
 
   const grid = document.getElementById("grid");
-  const gridWrap = document.getElementById("gridWrap");
-  const relLinesEl = document.getElementById("relLines");
-  const relLabelsEl = document.getElementById("relLabels");
-
-  const GUTTER_HALF = 7;
-
-  function sideFor(colIdx, otherColIdx) {
-    if (colIdx < otherColIdx) return "right";
-    if (colIdx > otherColIdx) return "left";
-    return colIdx === COLUMNS.length - 1 ? "left" : "right";
-  }
-
-  function edgePoint(el, side, wrapRect) {
-    const rect = el.getBoundingClientRect();
-    const y = rect.top + rect.height / 2 - wrapRect.top;
-    const x = (side === "right" ? rect.right : rect.left) - wrapRect.left;
-    return { x, y };
-  }
-
-  function gutterX(el, side, wrapRect, fanOffset) {
-    const cellRect = el.closest(".cell").getBoundingClientRect();
-    const base = side === "right"
-      ? cellRect.right - wrapRect.left + GUTTER_HALF
-      : cellRect.left - wrapRect.left - GUTTER_HALF;
-    return side === "right" ? base + fanOffset : base - fanOffset;
-  }
-
-  const FAN_STEP = 7;
-
-  // Relationships whose trunk shares the same column+side gutter get fanned
-  // out around it so their dashed lines don't stack on the same pixels.
-  function assignFanOffsets(pairs) {
-    const groups = new Map();
-    pairs.forEach((p, i) => {
-      const key = `${p.colIdx}:${p.side}`;
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(i);
-    });
-    const offsets = new Array(pairs.length);
-    groups.forEach(idxs => {
-      const n = idxs.length;
-      idxs.forEach((i, slot) => {
-        offsets[i] = (slot - (n - 1) / 2) * FAN_STEP;
-      });
-    });
-    return offsets;
-  }
-
-  function arrowPolygonPoints(tipX, tipY, pointingDir) {
-    const s = 5;
-    if (pointingDir === "left") {
-      return `${tipX},${tipY} ${tipX + s},${tipY - s} ${tipX + s},${tipY + s}`;
-    }
-    return `${tipX},${tipY} ${tipX - s},${tipY - s} ${tipX - s},${tipY + s}`;
-  }
-
-  function drawRelLines() {
-    relLinesEl.innerHTML = "";
-    relLabelsEl.innerHTML = "";
-
-    const w = gridWrap.offsetWidth;
-    const h = gridWrap.offsetHeight;
-    relLinesEl.setAttribute("width", w);
-    relLinesEl.setAttribute("height", h);
-    relLinesEl.setAttribute("viewBox", `0 0 ${w} ${h}`);
-
-    const wrapRect = gridWrap.getBoundingClientRect();
-    const seen = new Set();
-
-    // Pass 1: collect every relationship's geometry without drawing yet, so
-    // relationships that would share the same column+side gutter can be
-    // fanned apart instead of stacking on identical coordinates.
-    const rels = [];
-    data.forEach(n => {
-      (n.rel || []).forEach(r => {
-        const key = [n.id, r.to].sort().join("|");
-        if (seen.has(key)) return;
-        seen.add(key);
-        const target = data.find(d => d.id === r.to);
-        if (!target) return;
-
-        const elA = grid.querySelector(`[data-id="${n.id}"]`);
-        const elB = grid.querySelector(`[data-id="${target.id}"]`);
-        if (!elA || !elB) return;
-
-        const colA = COLUMNS.findIndex(c => c.id === n.col);
-        const colB = COLUMNS.findIndex(c => c.id === target.col);
-        const sideA = sideFor(colA, colB);
-        const sideB = sideFor(colB, colA);
-
-        rels.push({
-          target, elA, elB, colA, colB, sideA, sideB,
-          ptA: edgePoint(elA, sideA, wrapRect),
-          ptB: edgePoint(elB, sideB, wrapRect),
-        });
-      });
-    });
-
-    const offsetsA = assignFanOffsets(rels.map(r => ({ colIdx: r.colA, side: r.sideA })));
-    const offsetsB = assignFanOffsets(rels.map(r => ({ colIdx: r.colB, side: r.sideB })));
-
-    rels.forEach((r, i) => {
-      const { target, elA, elB, sideA, sideB, ptA, ptB } = r;
-      const gxA = gutterX(elA, sideA, wrapRect, offsetsA[i]);
-      const gxB = gutterX(elB, sideB, wrapRect, offsetsB[i]);
-      const midY = (ptA.y + ptB.y) / 2 + offsetsA[i] * 0.4;
-
-      {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute(
-          "d",
-          `M ${ptA.x} ${ptA.y} L ${gxA} ${ptA.y} L ${gxA} ${midY} L ${gxB} ${midY} L ${gxB} ${ptB.y} L ${ptB.x} ${ptB.y}`
-        );
-        path.setAttribute("fill", "none");
-        path.setAttribute("stroke", "var(--ink-faint)");
-        path.setAttribute("stroke-width", "1.6");
-        path.setAttribute("stroke-dasharray", "3 5");
-        path.setAttribute("opacity", "0.85");
-        relLinesEl.appendChild(path);
-
-        const arrowDirB = sideB === "right" ? "left" : "right";
-        const arrowB = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-        arrowB.setAttribute("points", arrowPolygonPoints(ptB.x, ptB.y, arrowDirB));
-        arrowB.setAttribute("fill", `var(--c-${target.lane})`);
-        relLinesEl.appendChild(arrowB);
-      }
-    });
-  }
 
   function render() {
     grid.innerHTML = "";
@@ -839,8 +663,6 @@
         grid.appendChild(cell);
       });
     });
-
-    requestAnimationFrame(drawRelLines);
   }
 
   function renderNode(lane, n) {
@@ -927,6 +749,4 @@
   });
 
   render();
-  requestAnimationFrame(drawRelLines);
-  window.addEventListener("resize", () => requestAnimationFrame(drawRelLines));
 </script>
