@@ -612,25 +612,29 @@
   }
 
   td.cell-col {
-    vertical-align: middle;
+    padding: 0;
     border-right: 1px solid var(--border-soft);
   }
 
   .col-select {
+    display: block;
     width: 100%;
+    height: 100%;
+    box-sizing: border-box;
     font-family: inherit;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
-    color: var(--lane-accent);
-    background: color-mix(in srgb, var(--lane-accent) 10%, transparent);
-    border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 3px 5px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-left: 3px solid var(--lane-accent);
+    padding: 8px 10px;
     cursor: pointer;
+    transition: background 0.15s ease;
   }
   .col-select:hover,
   .col-select:focus {
-    border-color: var(--lane-accent);
+    background: color-mix(in srgb, var(--lane-accent) 8%, transparent);
   }
 
   td.cell-code {
@@ -733,7 +737,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = "pudo-map-nodes-v6";
+  const STORAGE_KEY = "pudo-map-nodes-v7";
 
   const REPO = {
     map: "hkmc-airlab/shucle-map-tool-doc",
@@ -778,6 +782,7 @@
     { id: "rider-log", lane: "rider", col: "b", code: "3270", title: "정차 로그 스키마 정의", status: "fixed", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "" },
     { id: "rider-dispatch", lane: "rider", col: "c", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "" },
     { id: "rider-point", lane: "rider", col: "c", code: "3286", title: "PUDO Point 노출 로직", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "" },
+    { id: "rider-provide", lane: "rider", col: "c", code: "3293", title: "PUDO 제공 로직 (기술사 전달)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "은지", remark: "기술사 디펜던시" },
     { id: "rider-ux", lane: "rider", col: "c", code: "3238", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "희원", remark: "" },
     { id: "rider-history", lane: "rider", col: "c", code: "3285", title: "메뉴 홈 > 검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "희원", remark: "" },
     { id: "rider-search", lane: "rider", col: "c", code: "3227", title: "통합검색 D2D AV 가호출 노출/플로우", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "영연", remark: "" },
@@ -785,7 +790,7 @@
     { id: "rider-usage", lane: "rider", col: "c", code: "3265", title: "이용/혜택내역 > 운행 정보 데이터 정의", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "차경", remark: "" },
     { id: "rider-nego-pickup", lane: "rider", col: "d", code: "3289", title: "정차 Negotiation 안내 (Pickup)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "희원", remark: "" },
     { id: "rider-nego-dropoff", lane: "rider", col: "d", code: "3290", title: "정차 Negotiation 안내 (Drop-off)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "희원", remark: "" },
-    { id: "rider-nego-push", lane: "rider", col: "d", code: "3291", title: "정차 Negotiation 안내 앱푸시 (Pickup/Drop-off)", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "차경", remark: "" },
+    { id: "rider-nego-push", lane: "rider", col: "d", code: "3291", title: "D2D AV 타입 앱푸시 신규 추가", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "차경", remark: "" },
     { id: "rider-nego-drive", lane: "rider", col: "d", code: "3292", title: "주행 Fallback 안내 (P/D 포함 도로 진입 불가)", status: "inbox", priority: "P1", milestone: "미정", assignee: "은지", remark: "" },
 
     { id: "driver-stop", lane: "driver", col: "d", code: "1028", title: "정차 위치 변경/실패 안내", status: "progress", priority: "P1", milestone: "4.15.0", assignee: "윤아", remark: "" },
@@ -1012,102 +1017,110 @@
 
       const tbody = document.createElement("tbody");
 
-      let prevCol = null;
-
+      const groups = [];
       items.forEach(n => {
-        const row = document.createElement("tr");
-        row.className = isOffTarget(n) ? "off-target" : "";
-        row.dataset.lane = lane.id;
-        row.dataset.id = n.id;
-        row.draggable = true;
+        const g = groups[groups.length - 1];
+        if (g && g.col === n.col) g.rows.push(n);
+        else groups.push({ col: n.col, rows: [n] });
+      });
 
-        const linkHref = n.code ? `https://github.com/${REPO[n.repo || lane.id]}/issues/${n.code}` : null;
-        const codeInner = n.code ? `#${n.code}` : "미생성";
-        const codeHtml = linkHref
-          ? `<a class="list-link" href="${linkHref}" target="_blank" rel="noopener">${codeInner}</a>`
-          : codeInner;
+      groups.forEach(group => {
+        group.rows.forEach((n, idxInGroup) => {
+          const row = document.createElement("tr");
+          row.className = isOffTarget(n) ? "off-target" : "";
+          row.dataset.lane = lane.id;
+          row.dataset.id = n.id;
+          row.draggable = true;
 
-        const sameAsPrev = n.col === prevCol;
-        prevCol = n.col;
+          const linkHref = n.code ? `https://github.com/${REPO[n.repo || lane.id]}/issues/${n.code}` : null;
+          const codeInner = n.code ? `#${n.code}` : "미생성";
+          const codeHtml = linkHref
+            ? `<a class="list-link" href="${linkHref}" target="_blank" rel="noopener">${codeInner}</a>`
+            : codeInner;
 
-        const colOptions = COLUMNS.map(c =>
-          `<option value="${c.id}" ${c.id === n.col ? "selected" : ""}>${c.label.replace(/^[A-Z]\.\s*/, "")}</option>`
-        ).join("");
+          let colCellHtml = "";
+          if (idxInGroup === 0) {
+            const colOptions = COLUMNS.map(c =>
+              `<option value="${c.id}" ${c.id === n.col ? "selected" : ""}>${c.label.replace(/^[A-Z]\.\s*/, "")}</option>`
+            ).join("");
+            colCellHtml = `<td class="cell-col" rowspan="${group.rows.length}"><select class="col-select" data-field="col">${colOptions}</select></td>`;
+          }
 
-        row.innerHTML = `
-          <td class="list-drag-handle">⠿</td>
-          <td class="cell-col">${sameAsPrev ? "" : `<select class="col-select" data-field="col">${colOptions}</select>`}</td>
-          <td class="cell-code">${codeHtml}</td>
-          <td class="cell-title"><span class="editable-cell" data-field="title">${n.title}</span></td>
-          <td class="cell-milestone"><span class="editable-cell" data-field="milestone">${n.milestone || ""}</span></td>
-          <td class="cell-status"><button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button></td>
-          <td class="cell-priority num"><span class="editable-cell" data-field="priority">${n.priority || ""}</span></td>
-          <td class="cell-assignee num"><span class="editable-cell" data-field="assignee">${n.assignee || ""}</span></td>
-          <td class="cell-remark"><span class="editable-cell" data-field="remark">${n.remark || ""}</span></td>
-        `;
+          row.innerHTML = `
+            <td class="list-drag-handle">⠿</td>
+            ${colCellHtml}
+            <td class="cell-code">${codeHtml}</td>
+            <td class="cell-title"><span class="editable-cell" data-field="title">${n.title}</span></td>
+            <td class="cell-milestone"><span class="editable-cell" data-field="milestone">${n.milestone || ""}</span></td>
+            <td class="cell-status"><button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button></td>
+            <td class="cell-priority num"><span class="editable-cell" data-field="priority">${n.priority || ""}</span></td>
+            <td class="cell-assignee num"><span class="editable-cell" data-field="assignee">${n.assignee || ""}</span></td>
+            <td class="cell-remark"><span class="editable-cell" data-field="remark">${n.remark || ""}</span></td>
+          `;
 
-        ["title", "milestone", "priority", "assignee", "remark"].forEach(key => {
-          makeListEditable(row.querySelector(`[data-field="${key}"]`), n, key);
-        });
+          ["title", "milestone", "priority", "assignee", "remark"].forEach(key => {
+            makeListEditable(row.querySelector(`[data-field="${key}"]`), n, key);
+          });
 
-        const statusEl = row.querySelector('[data-field="status"]');
-        statusEl.addEventListener("click", ev => {
-          ev.preventDefault();
-          ev.stopPropagation();
-          const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(n.status) + 1) % STATUS_CYCLE.length];
-          n.status = next;
-          save();
-          render();
-          renderList();
-        });
-
-        const colEl = row.querySelector('[data-field="col"]');
-        if (colEl) {
-          colEl.addEventListener("click", ev => ev.stopPropagation());
-          colEl.addEventListener("change", () => {
-            n.col = colEl.value;
+          const statusEl = row.querySelector('[data-field="status"]');
+          statusEl.addEventListener("click", ev => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(n.status) + 1) % STATUS_CYCLE.length];
+            n.status = next;
             save();
             render();
             renderList();
           });
-        }
 
-        row.addEventListener("dragstart", ev => {
-          dragSrcId = n.id;
-          row.classList.add("dragging");
-          ev.dataTransfer.effectAllowed = "move";
-        });
-        row.addEventListener("dragend", () => {
-          row.classList.remove("dragging");
-          tbody.querySelectorAll("tr.drag-over").forEach(r => r.classList.remove("drag-over"));
-        });
-        row.addEventListener("dragover", ev => {
-          if (dragSrcId === null || dragSrcId === n.id) return;
-          const srcNode = data.find(d => d.id === dragSrcId);
-          if (!srcNode || srcNode.lane !== n.lane) return;
-          ev.preventDefault();
-          row.classList.add("drag-over");
-        });
-        row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
-        row.addEventListener("drop", ev => {
-          ev.preventDefault();
-          row.classList.remove("drag-over");
-          if (dragSrcId === null || dragSrcId === n.id) return;
-          const srcIdx = data.findIndex(d => d.id === dragSrcId);
-          const targetIdx = data.findIndex(d => d.id === n.id);
-          if (srcIdx === -1 || targetIdx === -1) return;
-          const srcNode = data[srcIdx];
-          if (srcNode.lane !== n.lane) return;
-          data.splice(srcIdx, 1);
-          const newTargetIdx = data.findIndex(d => d.id === n.id);
-          data.splice(newTargetIdx, 0, srcNode);
-          dragSrcId = null;
-          save();
-          render();
-          renderList();
-        });
+          const colEl = row.querySelector('[data-field="col"]');
+          if (colEl) {
+            colEl.addEventListener("click", ev => ev.stopPropagation());
+            colEl.addEventListener("change", () => {
+              n.col = colEl.value;
+              save();
+              render();
+              renderList();
+            });
+          }
 
-        tbody.appendChild(row);
+          row.addEventListener("dragstart", ev => {
+            dragSrcId = n.id;
+            row.classList.add("dragging");
+            ev.dataTransfer.effectAllowed = "move";
+          });
+          row.addEventListener("dragend", () => {
+            row.classList.remove("dragging");
+            tbody.querySelectorAll("tr.drag-over").forEach(r => r.classList.remove("drag-over"));
+          });
+          row.addEventListener("dragover", ev => {
+            if (dragSrcId === null || dragSrcId === n.id) return;
+            const srcNode = data.find(d => d.id === dragSrcId);
+            if (!srcNode || srcNode.lane !== n.lane) return;
+            ev.preventDefault();
+            row.classList.add("drag-over");
+          });
+          row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+          row.addEventListener("drop", ev => {
+            ev.preventDefault();
+            row.classList.remove("drag-over");
+            if (dragSrcId === null || dragSrcId === n.id) return;
+            const srcIdx = data.findIndex(d => d.id === dragSrcId);
+            const targetIdx = data.findIndex(d => d.id === n.id);
+            if (srcIdx === -1 || targetIdx === -1) return;
+            const srcNode = data[srcIdx];
+            if (srcNode.lane !== n.lane) return;
+            data.splice(srcIdx, 1);
+            const newTargetIdx = data.findIndex(d => d.id === n.id);
+            data.splice(newTargetIdx, 0, srcNode);
+            dragSrcId = null;
+            save();
+            render();
+            renderList();
+          });
+
+          tbody.appendChild(row);
+        });
       });
 
       table.appendChild(tbody);
