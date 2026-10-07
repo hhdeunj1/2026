@@ -20,6 +20,11 @@
     --c-rider: #AE4F2E;
     --c-driver: #1F7A66;
 
+    --cat-a: #6D28D9;
+    --cat-b: #B45309;
+    --cat-c: #0E7490;
+    --cat-d: #BE123C;
+
     --status-progress: #2B5FD9;
     --status-progress-bg: #E7EDFC;
     --status-fixed: #1C8657;
@@ -48,6 +53,11 @@
       --c-rider: #E28A68;
       --c-driver: #4FC4A8;
 
+      --cat-a: #B794F6;
+      --cat-b: #E8A94E;
+      --cat-c: #4FD1D9;
+      --cat-d: #F0708E;
+
       --status-progress: #85ACFF;
       --status-progress-bg: #1E2A47;
       --status-fixed: #63DBA6;
@@ -75,6 +85,11 @@
     --c-common: #8296E6;
     --c-rider: #E28A68;
     --c-driver: #4FC4A8;
+
+    --cat-a: #B794F6;
+    --cat-b: #E8A94E;
+    --cat-c: #4FD1D9;
+    --cat-d: #F0708E;
 
     --status-progress: #85ACFF;
     --status-progress-bg: #1E2A47;
@@ -552,7 +567,7 @@
   }
 
   .list-table col.c-drag { width: 20px; }
-  .list-table col.c-col { width: 128px; }
+  .list-table col.c-col { width: 172px; }
   .list-table col.c-code { width: 58px; }
   .list-table col.c-milestone { width: 68px; }
   .list-table col.c-status { width: 92px; }
@@ -616,23 +631,33 @@
   }
 
   .col-select {
-    display: block;
-    width: 100%;
-    font-family: inherit;
-    font-size: 12.4px;
-    font-weight: 600;
-    color: var(--ink);
-    background: transparent;
-    border: none;
-    border-radius: 4px;
-    padding: 2px 4px;
-    margin: 0 -4px;
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--cat-color);
+    background: color-mix(in srgb, var(--cat-color) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cat-color) 30%, transparent);
+    border-radius: 999px;
+    padding: 3px 10px;
     cursor: pointer;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
   .col-select:hover,
   .col-select:focus {
-    background: color-mix(in srgb, var(--lane-accent) 10%, transparent);
+    border-color: var(--cat-color);
   }
+
+  .col-select[data-col="a"] { --cat-color: var(--cat-a); }
+  .col-select[data-col="b"] { --cat-color: var(--cat-b); }
+  .col-select[data-col="c"] { --cat-color: var(--cat-c); }
+  .col-select[data-col="d"] { --cat-color: var(--cat-d); }
 
   td.cell-code {
     font-family: "IBM Plex Mono", monospace;
@@ -1040,7 +1065,7 @@
             const colOptions = COLUMNS.map(c =>
               `<option value="${c.id}" ${c.id === n.col ? "selected" : ""}>${c.label.replace(/^[A-Z]\.\s*/, "")}</option>`
             ).join("");
-            colCellHtml = `<td class="cell-col" rowspan="${group.rows.length}"><select class="col-select" data-field="col">${colOptions}</select></td>`;
+            colCellHtml = `<td class="cell-col" rowspan="${group.rows.length}"><select class="col-select" data-field="col" data-col="${n.col}">${colOptions}</select></td>`;
           }
 
           row.innerHTML = `
