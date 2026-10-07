@@ -612,29 +612,26 @@
   }
 
   td.cell-col {
-    padding: 0;
     border-right: 1px solid var(--border-soft);
   }
 
   .col-select {
     display: block;
     width: 100%;
-    height: 100%;
-    box-sizing: border-box;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 12.4px;
     font-weight: 600;
     color: var(--ink);
     background: transparent;
     border: none;
-    border-left: 3px solid var(--lane-accent);
-    padding: 8px 10px;
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin: 0 -4px;
     cursor: pointer;
-    transition: background 0.15s ease;
   }
   .col-select:hover,
   .col-select:focus {
-    background: color-mix(in srgb, var(--lane-accent) 8%, transparent);
+    background: color-mix(in srgb, var(--lane-accent) 10%, transparent);
   }
 
   td.cell-code {
