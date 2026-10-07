@@ -567,7 +567,7 @@
   }
 
   .list-table col.c-drag { width: 20px; }
-  .list-table col.c-col { width: 172px; }
+  .list-table col.c-col { width: 44px; }
   .list-table col.c-code { width: 58px; }
   .list-table col.c-milestone { width: 68px; }
   .list-table col.c-status { width: 92px; }
@@ -618,8 +618,9 @@
     letter-spacing: -1px;
     opacity: 0.4;
     user-select: none;
-    pointer-events: none;
+    cursor: grab;
   }
+  .list-drag-handle:active { cursor: grabbing; }
 
   .list-link {
     color: inherit;
@@ -627,32 +628,37 @@
   }
 
   td.cell-col {
-    border-right: 1px solid var(--border-soft);
+    text-align: center;
   }
 
   .col-select {
     appearance: none;
     -webkit-appearance: none;
-    display: inline-flex;
-    align-items: center;
-    max-width: 100%;
-    font-family: "Source Sans 3", sans-serif;
-    font-size: 11.5px;
+    display: inline-block;
+    width: 24px;
+    height: 20px;
+    line-height: 20px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
     font-weight: 700;
+    text-align: center;
+    text-indent: 0;
     color: var(--cat-color);
-    background: color-mix(in srgb, var(--cat-color) 15%, transparent);
-    border: 1px solid color-mix(in srgb, var(--cat-color) 30%, transparent);
-    border-radius: 999px;
-    padding: 3px 10px;
+    background: color-mix(in srgb, var(--cat-color) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cat-color) 32%, transparent);
+    border-radius: 6px;
+    padding: 0;
     cursor: pointer;
-    text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    text-overflow: clip;
   }
   .col-select:hover,
   .col-select:focus {
     border-color: var(--cat-color);
   }
+
+  .col-select option { color: var(--ink); background: var(--surface); }
 
   .col-select[data-col="a"] { --cat-color: var(--cat-a); }
   .col-select[data-col="b"] { --cat-color: var(--cat-b); }
@@ -1052,7 +1058,6 @@
           row.className = isOffTarget(n) ? "off-target" : "";
           row.dataset.lane = lane.id;
           row.dataset.id = n.id;
-          row.draggable = true;
 
           const linkHref = n.code ? `https://github.com/${REPO[n.repo || lane.id]}/issues/${n.code}` : null;
           const codeInner = n.code ? `#${n.code}` : "미생성";
@@ -1060,16 +1065,14 @@
             ? `<a class="list-link" href="${linkHref}" target="_blank" rel="noopener">${codeInner}</a>`
             : codeInner;
 
-          let colCellHtml = "";
-          if (idxInGroup === 0) {
-            const colOptions = COLUMNS.map(c =>
-              `<option value="${c.id}" ${c.id === n.col ? "selected" : ""}>${c.label.replace(/^[A-Z]\.\s*/, "")}</option>`
-            ).join("");
-            colCellHtml = `<td class="cell-col" rowspan="${group.rows.length}"><select class="col-select" data-field="col" data-col="${n.col}">${colOptions}</select></td>`;
-          }
+          const colOptions = COLUMNS.map(c =>
+            `<option value="${c.id}" ${c.id === n.col ? "selected" : ""}>${c.id.toUpperCase()} · ${c.label.replace(/^[A-Z]\.\s*/, "")}</option>`
+          ).join("");
+          const colLabel = COLUMNS.find(c => c.id === n.col)?.label || "";
+          const colCellHtml = `<td class="cell-col"><select class="col-select" data-field="col" data-col="${n.col}" title="${colLabel}">${colOptions}</select></td>`;
 
           row.innerHTML = `
-            <td class="list-drag-handle">⠿</td>
+            <td class="list-drag-handle" draggable="true">⠿</td>
             ${colCellHtml}
             <td class="cell-code">${codeHtml}</td>
             <td class="cell-title"><span class="editable-cell" data-field="title">${n.title}</span></td>
@@ -1106,12 +1109,13 @@
             });
           }
 
-          row.addEventListener("dragstart", ev => {
+          const handleEl = row.querySelector(".list-drag-handle");
+          handleEl.addEventListener("dragstart", ev => {
             dragSrcId = n.id;
             row.classList.add("dragging");
             ev.dataTransfer.effectAllowed = "move";
           });
-          row.addEventListener("dragend", () => {
+          handleEl.addEventListener("dragend", () => {
             row.classList.remove("dragging");
             tbody.querySelectorAll("tr.drag-over").forEach(r => r.classList.remove("drag-over"));
           });
