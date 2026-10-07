@@ -546,11 +546,8 @@
 
 <div class="page">
   <header class="top">
-    <p class="eyebrow">PUDO · Last updated 2026-10-04</p>
+    <p class="eyebrow">PUDO · Last updated 2026-10-06</p>
     <h1>CROSS-PRODUCT ISSUE MATRIX</h1>
-    <p class="lede">
-      PUDO(승하차 지점) 관련 이슈는 4개 레포에 흩어져 있지만 실제 서로 맞물려 있습니다.
-    </p>
     <ul class="lede-list">
       <li><b>맵데이터</b> — 승하차 가능 여부를 결정하는 기반 데이터</li>
       <li><b>공통</b> — PUDO 데이터 구조와 negotiation 등 코어 정책·시나리오</li>
@@ -588,7 +585,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = "pudo-map-nodes-v3";
+  const STORAGE_KEY = "pudo-map-nodes-v4";
 
   const REPO = {
     map: "hkmc-airlab/shucle-map-tool-doc",
@@ -621,24 +618,25 @@
     { id: "map-gap", lane: "map", col: "b", code: "572", title: "도로 이격 발생 시 블랙리스트 데이터 처리", status: "icebox", meta: "4.16.0 · 애란" },
     { id: "map-points", lane: "map", col: "b", code: "536", title: "PuDo Points 관리 기능", status: "icebox", meta: "P2 · 미정 · 애란" },
 
-    { id: "common-a", lane: "common", col: "a", code: null, title: "데이터 구조 및 관리 정책", status: "planned", meta: "P1 · 4.15.0", note: "cf. 맵툴 #537, #569", rel: [{ to: "map-whitelist" }] },
-    { id: "common-b", lane: "common", col: "b", code: null, title: "PUDO 운영 및 고도화", status: "planned", meta: "P1 · 미정", note: "cf. 맵툴 #536, #571, #572 · 라앱 #3270", rel: [{ to: "rider-log" }] },
+    { id: "common-a", lane: "common", col: "a", code: "3241", repo: "rider", title: "데이터 구조 및 관리 정책", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 맵툴 #537, #569", rel: [{ to: "map-whitelist" }] },
+    { id: "common-b", lane: "common", col: "b", code: "3269", repo: "rider", title: "PUDO 운영 및 고도화 (정차 데이터 활용 등)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 맵툴 #536, #571, #572 · 라앱 #3270", rel: [{ to: "rider-log" }] },
     { id: "common-c", lane: "common", col: "c", code: null, title: "AV 호출 시나리오 및 배차 정책", status: "planned", meta: "P1 · 4.15.0", note: "cf. 라앱 #3242, #3286, #3238", rel: [{ to: "rider-dispatch" }] },
-    { id: "common-d1", lane: "common", col: "d", code: null, title: "AV 정차 시나리오 정의 (Negotiation)", status: "planned", meta: "P1 · 4.15.0", note: "cf. 라앱 Pickup/Drop-off/앱푸시 안내 · 드앱 #1028", rel: [{ to: "rider-nego-pickup" }, { to: "driver-stop" }] },
-    { id: "common-d2", lane: "common", col: "d", code: null, title: "AV 주행 시나리오 정의", status: "planned", meta: "P1 · 미정", note: "cf. 라앱 주행 Fallback 안내 · 드앱 주행 시나리오", rel: [{ to: "rider-nego-drive" }, { to: "driver-drive" }] },
+    { id: "common-d-pick", lane: "common", col: "d", code: "3239", repo: "rider", title: "Pick 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3289 · 드앱 #1028", rel: [{ to: "rider-nego-pickup" }, { to: "driver-stop" }] },
+    { id: "common-d-drop", lane: "common", col: "d", code: "3240", repo: "rider", title: "Drop 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3290 · 드앱 #1028", rel: [{ to: "rider-nego-dropoff" }, { to: "driver-stop" }] },
+    { id: "common-d-drive", lane: "common", col: "d", code: "3268", repo: "rider", title: "주행 Fallback 시나리오 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 라앱 #3292 · 드앱 미생성", rel: [{ to: "rider-nego-drive" }, { to: "driver-drive" }] },
 
     { id: "rider-log", lane: "rider", col: "b", code: "3270", title: "정차 로그 스키마 정의", status: "fixed", meta: "P1 · 4.15.0 · 은지" },
     { id: "rider-dispatch", lane: "rider", col: "c", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", meta: "P1 · 4.15.0 · 은지" },
     { id: "rider-point", lane: "rider", col: "c", code: "3286", title: "PUDO Point 노출 로직", status: "progress", meta: "P1 · 4.15.0 · 은지" },
-    { id: "rider-ux", lane: "rider", col: "c", code: "3238", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0 · 은지", rel: [{ to: "rider-search" }, { to: "rider-quick" }] },
-    { id: "rider-history", lane: "rider", col: "c", code: "3285", title: "검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0 · 은지" },
+    { id: "rider-ux", lane: "rider", col: "c", code: "3238", title: "D2D AV > 가호출·호출 UX (PUDO 반영)", status: "progress", meta: "P1 · 4.15.0 · 희원", rel: [{ to: "rider-search" }, { to: "rider-quick" }] },
+    { id: "rider-history", lane: "rider", col: "c", code: "3285", title: "메뉴 홈 > 검색기록/호출히스토리 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0 · 희원" },
     { id: "rider-search", lane: "rider", col: "c", code: "3227", title: "통합검색 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0 · 영연" },
     { id: "rider-quick", lane: "rider", col: "c", code: "3228", title: "빠른호출 D2D AV 가호출 노출/플로우", status: "progress", meta: "P1 · 4.15.0 · 영연" },
     { id: "rider-usage", lane: "rider", col: "c", code: "3265", title: "이용/혜택내역 > 운행 정보 데이터 정의", status: "progress", meta: "P1 · 4.15.0 · 차경" },
-    { id: "rider-nego-pickup", lane: "rider", col: "d", code: null, title: "정차 Negotiation 안내 (Pickup)", status: "planned", meta: "P1 · 4.15.0" },
-    { id: "rider-nego-dropoff", lane: "rider", col: "d", code: null, title: "정차 Negotiation 안내 (Drop-off)", status: "planned", meta: "P1 · 4.15.0" },
-    { id: "rider-nego-push", lane: "rider", col: "d", code: null, title: "정차 Fallback 안내 (앱푸시)", status: "planned", meta: "P1 · 4.15.0" },
-    { id: "rider-nego-drive", lane: "rider", col: "d", code: null, title: "주행 Fallback 안내 (P/D 포함 도로 진입 불가)", status: "planned", meta: "P1 · 미정" },
+    { id: "rider-nego-pickup", lane: "rider", col: "d", code: "3289", title: "정차 Negotiation 안내 (Pickup)", status: "progress", meta: "P1 · 4.15.0 · 희원" },
+    { id: "rider-nego-dropoff", lane: "rider", col: "d", code: "3290", title: "정차 Negotiation 안내 (Drop-off)", status: "progress", meta: "P1 · 4.15.0 · 희원" },
+    { id: "rider-nego-push", lane: "rider", col: "d", code: "3291", title: "정차 Negotiation 안내 앱푸시 (Pickup/Drop-off)", status: "progress", meta: "P1 · 4.15.0 · 차경" },
+    { id: "rider-nego-drive", lane: "rider", col: "d", code: "3292", title: "주행 Fallback 안내 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지" },
 
     { id: "driver-stop", lane: "driver", col: "d", code: "1028", title: "정차 위치 변경/실패 안내", status: "progress", meta: "P1 · 4.15.0 · 윤아" },
     { id: "driver-drive", lane: "driver", col: "d", code: null, title: "주행 시나리오 정의 (드앱)", status: "planned", meta: "P1 · 미정" },
@@ -692,11 +690,33 @@
     return { x, y };
   }
 
-  function gutterX(el, side, wrapRect) {
+  function gutterX(el, side, wrapRect, fanOffset) {
     const cellRect = el.closest(".cell").getBoundingClientRect();
-    return side === "right"
+    const base = side === "right"
       ? cellRect.right - wrapRect.left + GUTTER_HALF
       : cellRect.left - wrapRect.left - GUTTER_HALF;
+    return side === "right" ? base + fanOffset : base - fanOffset;
+  }
+
+  const FAN_STEP = 7;
+
+  // Relationships whose trunk shares the same column+side gutter get fanned
+  // out around it so their dashed lines don't stack on the same pixels.
+  function assignFanOffsets(pairs) {
+    const groups = new Map();
+    pairs.forEach((p, i) => {
+      const key = `${p.colIdx}:${p.side}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(i);
+    });
+    const offsets = new Array(pairs.length);
+    groups.forEach(idxs => {
+      const n = idxs.length;
+      idxs.forEach((i, slot) => {
+        offsets[i] = (slot - (n - 1) / 2) * FAN_STEP;
+      });
+    });
+    return offsets;
   }
 
   function arrowPolygonPoints(tipX, tipY, pointingDir) {
@@ -720,6 +740,10 @@
     const wrapRect = gridWrap.getBoundingClientRect();
     const seen = new Set();
 
+    // Pass 1: collect every relationship's geometry without drawing yet, so
+    // relationships that would share the same column+side gutter can be
+    // fanned apart instead of stacking on identical coordinates.
+    const rels = [];
     data.forEach(n => {
       (n.rel || []).forEach(r => {
         const key = [n.id, r.to].sort().join("|");
@@ -737,12 +761,24 @@
         const sideA = sideFor(colA, colB);
         const sideB = sideFor(colB, colA);
 
-        const ptA = edgePoint(elA, sideA, wrapRect);
-        const ptB = edgePoint(elB, sideB, wrapRect);
-        const gxA = gutterX(elA, sideA, wrapRect);
-        const gxB = gutterX(elB, sideB, wrapRect);
-        const midY = (ptA.y + ptB.y) / 2;
+        rels.push({
+          target, elA, elB, colA, colB, sideA, sideB,
+          ptA: edgePoint(elA, sideA, wrapRect),
+          ptB: edgePoint(elB, sideB, wrapRect),
+        });
+      });
+    });
 
+    const offsetsA = assignFanOffsets(rels.map(r => ({ colIdx: r.colA, side: r.sideA })));
+    const offsetsB = assignFanOffsets(rels.map(r => ({ colIdx: r.colB, side: r.sideB })));
+
+    rels.forEach((r, i) => {
+      const { target, elA, elB, sideA, sideB, ptA, ptB } = r;
+      const gxA = gutterX(elA, sideA, wrapRect, offsetsA[i]);
+      const gxB = gutterX(elB, sideB, wrapRect, offsetsB[i]);
+      const midY = (ptA.y + ptB.y) / 2 + offsetsA[i] * 0.4;
+
+      {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute(
           "d",
@@ -760,7 +796,7 @@
         arrowB.setAttribute("points", arrowPolygonPoints(ptB.x, ptB.y, arrowDirB));
         arrowB.setAttribute("fill", `var(--c-${target.lane})`);
         relLinesEl.appendChild(arrowB);
-      });
+      }
     });
   }
 
@@ -810,7 +846,7 @@
   function renderNode(lane, n) {
     const el = document.createElement(n.code ? "a" : "div");
     if (n.code) {
-      el.href = `https://github.com/${REPO[lane.id]}/issues/${n.code}`;
+      el.href = `https://github.com/${REPO[n.repo || lane.id]}/issues/${n.code}`;
       el.target = "_blank";
       el.rel = "noopener";
     }
