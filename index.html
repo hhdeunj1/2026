@@ -264,6 +264,34 @@
     min-width: 128px;
   }
 
+  .view-switch {
+    display: inline-flex;
+    padding: 2px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    gap: 2px;
+  }
+
+  .view-btn {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-faint);
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    padding: 5px 11px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .view-btn:hover { color: var(--ink); }
+  .view-btn.is-active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+
   /* ---- matrix ---- */
 
   .matrix-shell {
@@ -350,10 +378,10 @@
     min-height: 54px;
   }
 
-  .lane-row[data-lane="map"] { --lane-accent: var(--c-map); }
-  .lane-row[data-lane="common"] { --lane-accent: var(--c-common); }
-  .lane-row[data-lane="rider"] { --lane-accent: var(--c-rider); }
-  .lane-row[data-lane="driver"] { --lane-accent: var(--c-driver); }
+  [data-lane="map"] { --lane-accent: var(--c-map); }
+  [data-lane="common"] { --lane-accent: var(--c-common); }
+  [data-lane="rider"] { --lane-accent: var(--c-rider); }
+  [data-lane="driver"] { --lane-accent: var(--c-driver); }
 
   .node {
     position: relative;
@@ -489,6 +517,91 @@
     opacity: 0.5;
   }
 
+  /* ---- list view ---- */
+
+  .list-shell {
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    background: var(--surface-2);
+    box-shadow: var(--shadow);
+    padding: 6px 0;
+  }
+
+  .list-lane {
+    padding: 14px 20px 10px;
+  }
+
+  .list-lane + .list-lane {
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .list-lane-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .list-lane-head .row-tag { font-size: 13px; }
+  .list-lane-head .row-sub { font-size: 11px; }
+
+  .list-rows {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .list-row {
+    display: grid;
+    grid-template-columns: 50px 60px 1fr 150px 86px 160px;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 6px;
+    text-decoration: none;
+    color: var(--ink);
+    border-radius: 7px;
+    transition: background 0.15s ease;
+  }
+  a.list-row:hover { background: var(--surface); }
+
+  .list-row.off-target { opacity: 0.42; }
+  .list-row.off-target:hover { opacity: 1; }
+
+  .list-row .tag {
+    justify-self: start;
+  }
+
+  .list-row .code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+  }
+
+  .list-row .list-title {
+    font-size: 12.8px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .list-row .list-note {
+    font-size: 10.8px;
+    color: var(--ink-faint);
+    font-style: italic;
+    display: block;
+    font-weight: 400;
+  }
+
+  .list-row .list-col {
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  .list-row .meta {
+    font-size: 10.8px;
+    justify-self: end;
+    text-align: right;
+    cursor: default;
+  }
+
   footer.foot {
     margin-top: 18px;
     font-size: 12px;
@@ -519,15 +632,23 @@
         <span class="chip"><span class="dot" style="--dot-color: var(--c-driver)"></span>드라이버앱</span>
       </div>
       <div class="spacer"></div>
+      <div class="view-switch" id="viewSwitch">
+        <button type="button" class="view-btn is-active" data-view="board">보드</button>
+        <button type="button" class="view-btn" data-view="list">리스트</button>
+      </div>
       <span class="save-state" id="saveState">저장됨</span>
       <button class="btn" id="copyBtn">JSON 복사</button>
     </div>
   </header>
 
-  <div class="matrix-shell">
+  <div class="matrix-shell" id="boardView">
     <div class="matrix-scroll" id="scroll">
       <div class="matrix-grid" id="grid"></div>
     </div>
+  </div>
+
+  <div class="list-shell" id="listView" hidden>
+    <div class="list" id="list"></div>
   </div>
 
   <footer class="foot">
@@ -736,6 +857,82 @@
 
     return el;
   }
+
+  const listEl = document.getElementById("list");
+
+  function renderList() {
+    listEl.innerHTML = "";
+    const colLabel = Object.fromEntries(COLUMNS.map(c => [c.id, c.label.replace(/^[A-Z]\.\s*/, "")]));
+
+    LANES.forEach(lane => {
+      const items = data.filter(n => n.lane === lane.id);
+      if (!items.length) return;
+
+      const section = document.createElement("div");
+      section.className = "list-lane";
+      section.dataset.lane = lane.id;
+
+      const head = document.createElement("div");
+      head.className = "list-lane-head";
+      head.innerHTML = `<span class="row-tag">${lane.label}</span><span class="row-sub">${lane.sub} · ${items.length}건</span>`;
+      section.appendChild(head);
+
+      const rows = document.createElement("div");
+      rows.className = "list-rows";
+
+      items.forEach(n => {
+        const row = document.createElement(n.code ? "a" : "div");
+        if (n.code) {
+          row.href = `https://github.com/${REPO[n.repo || lane.id]}/issues/${n.code}`;
+          row.target = "_blank";
+          row.rel = "noopener";
+        }
+        row.className = "list-row" + (isOffTarget(n.meta) ? " off-target" : "");
+        row.dataset.lane = lane.id;
+
+        const codeHtml = n.code ? `#${n.code}` : "미생성";
+
+        row.innerHTML = `
+          <span class="tag">${lane.tag}</span>
+          <span class="code">${codeHtml}</span>
+          <span class="list-title">${n.title}${n.note ? `<span class="list-note">${n.note}</span>` : ""}</span>
+          <span class="list-col">${colLabel[n.col] || ""}</span>
+          <button type="button" class="status ${n.status}" data-field="status">${STATUS_LABEL[n.status]}</button>
+          <span class="meta">${n.meta}</span>
+        `;
+
+        const statusEl = row.querySelector('[data-field="status"]');
+        statusEl.addEventListener("click", ev => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(n.status) + 1) % STATUS_CYCLE.length];
+          n.status = next;
+          save();
+          render();
+          renderList();
+        });
+
+        rows.appendChild(row);
+      });
+
+      section.appendChild(rows);
+      listEl.appendChild(section);
+    });
+  }
+
+  const boardViewEl = document.getElementById("boardView");
+  const listViewEl = document.getElementById("listView");
+  let currentView = "board";
+
+  document.getElementById("viewSwitch").addEventListener("click", ev => {
+    const btn = ev.target.closest(".view-btn");
+    if (!btn) return;
+    currentView = btn.dataset.view;
+    document.querySelectorAll(".view-btn").forEach(b => b.classList.toggle("is-active", b === btn));
+    boardViewEl.hidden = currentView !== "board";
+    listViewEl.hidden = currentView !== "list";
+    if (currentView === "list") renderList();
+  });
 
   document.getElementById("copyBtn").addEventListener("click", async () => {
     const btn = document.getElementById("copyBtn");
