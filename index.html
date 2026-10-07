@@ -502,7 +502,7 @@
 
 <div class="page">
   <header class="top">
-    <p class="eyebrow">PUDO · Last updated 2026-10-06</p>
+    <p class="eyebrow">PUDO · Last updated 2026-10-07</p>
     <h1>CROSS-PRODUCT ISSUE MATRIX</h1>
     <ul class="lede-list">
       <li><b>맵데이터</b> — 승하차 가능 여부를 결정하는 기반 데이터</li>
@@ -531,13 +531,13 @@
   </div>
 
   <footer class="foot">
-    <span class="k">2026-10-04</span>
+    <span class="k">2026-10-07</span>
     <span>기준 · 제목·마일스톤은 더블클릭, 현황 뱃지는 클릭해서 바로 수정 — 변경은 이 브라우저에 자동 저장됩니다</span>
   </footer>
 </div>
 
 <script>
-  const STORAGE_KEY = "pudo-map-nodes-v4";
+  const STORAGE_KEY = "pudo-map-nodes-v5";
 
   const REPO = {
     map: "hkmc-airlab/shucle-map-tool-doc",
@@ -575,7 +575,7 @@
     { id: "common-c", lane: "common", col: "c", code: null, title: "AV 호출 시나리오 및 배차 정책", status: "planned", meta: "P1 · 4.15.0", note: "cf. 라앱 #3242, #3286, #3238" },
     { id: "common-d-pick", lane: "common", col: "d", code: "3239", repo: "rider", title: "Pick 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3289 · 드앱 #1028" },
     { id: "common-d-drop", lane: "common", col: "d", code: "3240", repo: "rider", title: "Drop 정차 Fallback 시나리오", status: "progress", meta: "P1 · 4.15.0 · 은지 · 이관예정", note: "cf. 라앱 #3290 · 드앱 #1028" },
-    { id: "common-d-drive", lane: "common", col: "d", code: "3268", repo: "rider", title: "주행 Fallback 시나리오 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 라앱 #3292 · 드앱 미생성" },
+    { id: "common-d-drive", lane: "common", col: "d", code: "3268", repo: "rider", title: "주행 Fallback 시나리오 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지 · 이관예정", note: "cf. 라앱 #3292 · 드앱 #1036" },
 
     { id: "rider-log", lane: "rider", col: "b", code: "3270", title: "정차 로그 스키마 정의", status: "fixed", meta: "P1 · 4.15.0 · 은지" },
     { id: "rider-dispatch", lane: "rider", col: "c", code: "3242", title: "AV D2D 배차 정책 (PUDO 반영)", status: "fixed", meta: "P1 · 4.15.0 · 은지" },
@@ -591,7 +591,7 @@
     { id: "rider-nego-drive", lane: "rider", col: "d", code: "3292", title: "주행 Fallback 안내 (P/D 포함 도로 진입 불가)", status: "inbox", meta: "P1 · 미정 · 은지" },
 
     { id: "driver-stop", lane: "driver", col: "d", code: "1028", title: "정차 위치 변경/실패 안내", status: "progress", meta: "P1 · 4.15.0 · 윤아" },
-    { id: "driver-drive", lane: "driver", col: "d", code: null, title: "주행 시나리오 정의 (드앱)", status: "planned", meta: "P1 · 미정" },
+    { id: "driver-drive", lane: "driver", col: "d", code: "1036", title: "도로 진입 불가 시 안내", status: "inbox", meta: "P1 · 미정 · 윤아" },
   ];
 
   const STATUS_LABEL = { progress: "진행중", fixed: "스펙확정", icebox: "아이스박스", inbox: "인박스", planned: "미생성" };
