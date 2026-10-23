@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>택시 서비스 추가 - 테이블 형식 템플릿</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #222;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { font-size: 13px; opacity: 0.9; }
+
+        .section { margin-bottom: 30px; }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .content-table {
+            background: white;
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .content-table td {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+
+        .left-column {
+            width: 50%;
+            background: #fff;
+            border-right: 2px solid #e0e0e0;
+        }
+
+        .right-column {
+            width: 50%;
+            background: #f8f9fa;
+        }
+
+        /* 입력 폼 스타일 */
+        .field { margin-bottom: 14px; }
+        .field-group { margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0; }
+        .field-group:last-child { border-bottom: none; margin-bottom: 0; }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 5px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 4px;
+        }
+
+        .required { background: #ffe0e0; color: #e83e8c; }
+        .optional { background: #e0f0ff; color: #0066cc; }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+        }
+
+        textarea { min-height: 60px; resize: vertical; }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .radio-group label, .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 400;
+            margin: 0;
+            padding: 6px 10px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            width: auto;
+            font-size: 12px;
+        }
+
+        .radio-group input, .checkbox-group input {
+            width: 14px;
+            height: 14px;
+            accent-color: #667eea;
+            margin: 0;
+        }
+
+        .field-note {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        /* 가이드 섹션 */
+        .guide-section {
+            margin-bottom: 15px;
+        }
+
+        .guide-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .guide-box {
+            font-size: 11px;
+            line-height: 1.6;
+            color: #555;
+            padding: 8px;
+            background: white;
+            border-left: 3px solid #667eea;
+            border-radius: 3px;
+            margin-bottom: 8px;
+        }
+
+        /* 지역별 예시 테이블 */
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .example-table th,
+        .example-table td {
+            padding: 6px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .example-table th {
+            background: #f0f4ff;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .example-table td {
+            background: white;
+            color: #555;
+        }
+
+        .subsection-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #222;
+            margin-top: 18px;
+            margin-bottom: 12px;
+            padding: 8px 0 8px 10px;
+            border-left: 4px solid #667eea;
+            background: #fafafa;
+        }
+
+        .nested-field {
+            margin-left: 16px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #fafafa;
+            border-left: 2px solid #e0e0e0;
+        }
+
+        .nested-field label {
+            font-size: 12px;
+            color: #333;
+        }
+
+        .item-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 10px;
+        }
+
+        .item-desc {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
+        }
+
+        .btn-copy { background: #667eea; color: white; }
+        .btn-copy:hover { background: #5568d3; }
+        .btn-reset { background: #e9ecef; color: #333; }
+        .btn-reset:hover { background: #dee2e6; }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 20px;
+            padding: 15px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 13px;
+            z-index: 9999;
+            animation: slideUp 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .toast.fade-out {
+            animation: slideDown 0.3s ease-out forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚕 택시 서비스 타입 추가 템플릿</h1>
+        </div>
+
+        <form id="form">
+            <!-- ① 기본정보 -->
+            <div class="section">
+                <div class="section-title">① 기본정보 <span class="badge required">필수</span></div>
+                <table class="content-table">
+                    <tr>
+                        <td class="left-column">
+                            <div class="field">
+                                <label>서비스명 <span class="badge required">필수</span></label>
+                                <input type="text" name="serviceName" placeholder="E.g. 경기 바우처 택시" required>
+                            </div>
+                            <div class="field">
+                                <label>라이더 노출 타이틀 <span class="badge required">필수</span></label>
+                                <input type="text" name="riderTitle" placeholder="E.g. 바우처 택시" required>
+                            </div>
+                            <div class="field">
+                                <label>설명 문구 <span class="badge required">필수</span></label>
+                                <textarea name="description" placeholder="E.g. 주변 교통약자택시 호출" required></textarea>
+                            </div>
+                            <div class="field">
+                                <label>아이콘 파일명 <span class="badge required">필수</span></label>
+                                <input type="text" name="icon" placeholder="E.g. gyeonggi_voucher.png" required>
+                            </div>
+                        </td>
+                        <td class="right-column">
+                            <div class="guide-section">
+                                <div class="guide-title">작성 가이드</div>
+                                <div class="guide-box">
+                                    <strong>서비스명:</strong> 관제, 기사앱 표시 공식 이름<br>
+                                    <strong>라이더 타이틀:</strong> 라이더 앱 카드 제목 (짧게)<br>
+                                    <strong>설명:</strong> 라이더 앱 카드 설명<br>
+                                    <strong>아이콘:</strong> PNG 파일명
+                                </div>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">지역별 예시</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th>항목</th>
+                                        <th>의왕</th>
+                                        <th>영암</th>
+                                        <th>영덕</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>서비스명</strong></td>
+                                        <td>경기 바우처 택시</td>
+                                        <td>영암 공공형 택시</td>
+                                        <td>영덕 관광형 택시</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>타이틀</strong></td>
+                                        <td>바우처 택시</td>
+                                        <td>공공형 택시</td>
+                                        <td>관광형 택시</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>아이콘</strong></td>
+                                        <td>gyeonggi_voucher.png</td>
+                                        <td>youngam_public.png</td>
+                                        <td>youngdeok_tourism.png</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ② 운영시간 -->
+            <div class="section">
+                <div class="section-title">② 운영시간 <span class="badge required">필수</span></div>
+                <table class="content-table">
+                    <tr>
+                        <td class="left-column">
+                            <div class="field">
+                                <label>평일 (월~금) <span class="badge required">필수</span></label>
+                                <input type="text" name="weekday" placeholder="E.g. 05:00~23:00 또는 미운영" required>
+                            </div>
+                            <div class="field">
+                                <label>토요일 <span class="badge required">필수</span></label>
+                                <input type="text" name="saturday" placeholder="E.g. 06:00~22:00 또는 미운영" required>
+                            </div>
+                            <div class="field">
+                                <label>일요일 <span class="badge required">필수</span></label>
+                                <input type="text" name="sunday" placeholder="E.g. 07:00~21:00 또는 미운영" required>
+                            </div>
+                            <div class="field">
+                                <label>공휴일 <span class="badge required">필수</span></label>
+                                <input type="text" name="holiday" placeholder="E.g. 07:00~21:00 또는 미운영" required>
+                            </div>
+                        </td>
+                        <td class="right-column">
+                            <div class="guide-section">
+                                <div class="guide-title">작성 가이드</div>
+                                <div class="guide-box">
+                                    HH:MM~HH:MM 형식<br>
+                                    빈 값 = 미운영
+                                </div>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">지역별 예시</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th>요일</th>
+                                        <th>의왕</th>
+                                        <th>영암</th>
+                                        <th>영덕</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>평일</strong></td>
+                                        <td>05:00~23:00</td>
+                                        <td>06:00~22:00</td>
+                                        <td>07:00~21:00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>토요일</strong></td>
+                                        <td>06:00~22:00</td>
+                                        <td>06:00~22:00</td>
+                                        <td>07:00~21:00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>일요일</strong></td>
+                                        <td>07:00~21:00</td>
+                                        <td>06:00~22:00</td>
+                                        <td>07:00~21:00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>공휴일</strong></td>
+                                        <td>07:00~21:00</td>
+                                        <td>미운영</td>
+                                        <td>07:00~21:00</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ③ 서비스지역 -->
+            <div class="section">
+                <div class="section-title">③ 서비스지역 <span class="badge required">필수</span></div>
+                <table class="content-table">
+                    <tr>
+                        <td class="left-column">
+                            <div class="field">
+                                <label>지역 방식 <span class="badge required">필수</span></label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="areaType" value="admin" onchange="updateArea()" required> 행정구역</label>
+                                    <label><input type="radio" name="areaType" value="polygon" onchange="updateArea()" required> 폴리곤</label>
+                                </div>
+                            </div>
+
+                            <div id="adminArea" class="field-group" style="display: none;">
+                                <label>출발지 (시군구)</label>
+                                <input type="text" name="originAdmin" placeholder="E.g. 의왕시, 과천시, 안양시, 군포시 또는 전체">
+                                <label>도착지 (시군구)</label>
+                                <input type="text" name="destAdmin" placeholder="E.g. 의왕시만 또는 전체">
+                            </div>
+
+                            <div id="polygonArea" class="field-group" style="display: none;">
+                                <label>폴리곤 좌표 (GeoJSON)</label>
+                                <textarea name="polygonCoords" placeholder="[[[127.0, 37.0], [127.1, 37.0], ...]]"></textarea>
+                            </div>
+
+                            <div class="field">
+                                <label>조건부 규칙 <span class="badge optional">선택</span></label>
+                                <input type="text" name="odRule" placeholder="E.g. 출발: 의왕 → 도착 자유">
+                            </div>
+                        </td>
+                        <td class="right-column">
+                            <div class="guide-section">
+                                <div class="guide-title">작성 가이드</div>
+                                <div class="guide-box">
+                                    <strong>행정구역:</strong> 시군구 이름 기입<br>
+                                    <strong>폴리곤:</strong> GeoJSON 좌표<br>
+                                    <strong>조건부:</strong> O-D 제약 사항
+                                </div>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">지역별 예시</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th>항목</th>
+                                        <th>의왕</th>
+                                        <th>영암</th>
+                                        <th>영덕</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>방식</strong></td>
+                                        <td>행정구역</td>
+                                        <td>행정구역</td>
+                                        <td>폴리곤</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>출발지</strong></td>
+                                        <td>의왕시, 과천시, 안양시, 군포시</td>
+                                        <td>영암군 전체</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>도착지</strong></td>
+                                        <td>의왕시만</td>
+                                        <td>영암군 전체</td>
+                                        <td>-</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ④ 요금정책 -->
+            <div class="section">
+                <div class="section-title">④ 요금정책 <span class="badge required">필수</span></div>
+                <table class="content-table">
+                    <tr>
+                        <td class="left-column">
+                            <!-- 기본 요금 정책 -->
+                            <div class="subsection-title">기본 요금 정책</div>
+                            <div class="field">
+                                <label>기본 요금 (원) <span class="badge required">필수</span></label>
+                                <input type="number" name="baseFare" placeholder="E.g. 3800 (없으면 0)" required>
+                            </div>
+                            <div class="field">
+                                <label>취소 페널티 (원) <span class="badge required">필수</span></label>
+                                <input type="number" name="cancelPenalty" placeholder="E.g. 1000 (없으면 0)" required>
+                            </div>
+                            <div class="field">
+                                <label>기사 입력 화면 노출 <span class="badge required">필수</span></label>
+                                <div class="item-desc">기사가 수동으로 요금을 입력하는 화면 표시 여부</div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="driverDisplay" value="Y" required> Y</label>
+                                    <label><input type="radio" name="driverDisplay" value="N" required> N</label>
+                                </div>
+                            </div>
+
+                            <!-- 요금 항목 선택 -->
+                            <div class="subsection-title" style="margin-top: 22px;">요금 항목 설정</div>
+                            <div class="field">
+                                <label>요금 방식 <span class="badge required">필수</span></label>
+                                <div class="item-desc">기사가 요금을 입력하는 방식 선택</div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="fareType" value="METER" onchange="updateFareType()" required> 미터기</label>
+                                    <label><input type="radio" name="fareType" value="DISTANCE" onchange="updateFareType()" required> 거리기준</label>
+                                </div>
+                            </div>
+
+                            <!-- 미터기/거리 요금 -->
+                            <div class="field-group" style="margin-top: 16px; padding: 0; background: none; border: none;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                    <input type="checkbox" name="includeMeter" checked disabled style="width: 16px; height: 16px;">
+                                    <span id="meterLabel" style="font-size: 13px; font-weight: 700; color: #222;">미터기 요금</span>
+                                    <span class="badge required" style="margin-left: auto;">필수</span>
+                                </div>
+                                <div class="nested-field">
+                                    <label>앱 내 노출 명칭 <span class="badge required">필수</span></label>
+                                    <input type="text" name="meterTitle" id="meterTitleInput" placeholder="E.g. 미터기 요금" required>
+                                </div>
+                                <div class="nested-field">
+                                    <label>기사 입력 여부 <span class="badge required">필수</span></label>
+                                    <div class="radio-group">
+                                        <label><input type="radio" name="meterDriverInput" required> O (가능)</label>
+                                        <label><input type="radio" name="meterDriverInput" required> X (불가)</label>
+                                    </div>
+                                </div>
+                                <div class="nested-field">
+                                    <label>요금 컨펌 화면 내 노출 <span class="badge required">필수</span></label>
+                                    <div class="radio-group">
+                                        <label><input type="radio" name="meterDisplay" required> O (노출)</label>
+                                        <label><input type="radio" name="meterDisplay" required> X (미노출)</label>
+                                    </div>
+                                </div>
+                                <div class="nested-field">
+                                    <label>바우처 할인 가능 <span class="badge required">필수</span></label>
+                                    <div class="radio-group">
+                                        <label><input type="radio" name="meterDiscount" required> O (할인)</label>
+                                        <label><input type="radio" name="meterDiscount" required> X (미할인)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 호출 요금 -->
+                            <div class="field-group" style="margin-top: 14px; padding: 0; background: none; border: none;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                    <input type="checkbox" name="includeCall" onchange="toggleItem('call')">
+                                    <span style="font-size: 13px; font-weight: 700; color: #222;">호출 요금</span>
+                                    <span class="badge optional" style="margin-left: auto;">선택</span>
+                                </div>
+                                <div id="call-fields" style="display: none;">
+                                    <div class="nested-field">
+                                        <label>앱 내 노출 명칭 <span class="badge required">필수</span></label>
+                                        <input type="text" name="callTitle" placeholder="E.g. 호출 요금" required>
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>기사 입력 여부 <span class="badge required">필수</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="callDriverInput" required> Y</label>
+                                            <label><input type="radio" name="callDriverInput" required> N</label>
+                                        </div>
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>요금 컨펌 화면 내 노출 <span class="badge required">필수</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="callDisplay" required> Y</label>
+                                            <label><input type="radio" name="callDisplay" required> N</label>
+                                        </div>
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>바우처 할인 가능 <span class="badge required">필수</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="callDiscount" required> O</label>
+                                            <label><input type="radio" name="callDiscount" required> X</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 통행료 -->
+                            <div class="field-group" style="margin-top: 14px; padding: 0; background: none; border: none;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                    <input type="checkbox" name="includeToll" onchange="toggleItem('toll')">
+                                    <span style="font-size: 13px; font-weight: 700; color: #222;">통행료</span>
+                                    <span class="badge optional" style="margin-left: auto;">선택</span>
+                                </div>
+                                <div id="toll-fields" style="display: none;">
+                                    <div class="nested-field">
+                                        <label>앱 내 노출 명칭</label>
+                                        <input type="text" name="tollTitle" placeholder="E.g. 통행료 (없으면 0)">
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>기사입력 <span class="badge optional">선택</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="tollDriverInput"> Y</label>
+                                            <label><input type="radio" name="tollDriverInput"> N</label>
+                                        </div>
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>컨펌 <span class="badge optional">선택</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="tollDisplay"> Y</label>
+                                            <label><input type="radio" name="tollDisplay"> N</label>
+                                        </div>
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>바우처 할인 <span class="badge optional">선택</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="tollDiscount"> O</label>
+                                            <label><input type="radio" name="tollDiscount"> X</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 주차비 -->
+                            <div class="field-group" style="margin-top: 14px; padding: 0; background: none; border: none;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                    <input type="checkbox" name="includeParking" onchange="toggleItem('parking')">
+                                    <span style="font-size: 13px; font-weight: 700; color: #222;">주차비</span>
+                                    <span class="badge optional" style="margin-left: auto;">선택</span>
+                                </div>
+                                <div id="parking-fields" style="display: none;">
+                                    <div class="nested-field">
+                                        <label>앱 내 노출 명칭</label>
+                                        <input type="text" name="parkingTitle" placeholder="E.g. 주차비 (없으면 0)">
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>기사입력 <span class="badge optional">선택</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="parkingDriverInput"> Y</label>
+                                            <label><input type="radio" name="parkingDriverInput"> N</label>
+                                        </div>
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>컨펌 <span class="badge optional">선택</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="parkingDisplay"> Y</label>
+                                            <label><input type="radio" name="parkingDisplay"> N</label>
+                                        </div>
+                                    </div>
+                                    <div class="nested-field">
+                                        <label>바우처 할인 <span class="badge optional">선택</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="parkingDiscount"> O</label>
+                                            <label><input type="radio" name="parkingDiscount"> X</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="right-column">
+                            <div class="guide-section">
+                                <div class="guide-title">작성 가이드</div>
+                                <div class="guide-box">
+                                    <strong>기본요금:</strong> 첫 호출 가격<br>
+                                    <strong>페널티:</strong> 취소 시 발생금액<br>
+                                    <strong>노출:</strong> Y=기사입력 / N=자동계산
+                                </div>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">기본 요금 예시</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th>항목</th>
+                                        <th>의왕</th>
+                                        <th>영암</th>
+                                        <th>영덕</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>기본요금</strong></td>
+                                        <td>3,800원</td>
+                                        <td>3,500원</td>
+                                        <td>4,000원</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>페널티</strong></td>
+                                        <td>1,000원</td>
+                                        <td>1,000원</td>
+                                        <td>1,500원</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>화면노출</strong></td>
+                                        <td>Y</td>
+                                        <td>N</td>
+                                        <td>Y</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">요금항목 설정 예시 (의왕)</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th style="font-size: 10px;">항목</th>
+                                        <th style="font-size: 10px;">앱 내 노출 명칭</th>
+                                        <th style="font-size: 10px;">기사 입력 여부</th>
+                                        <th style="font-size: 10px;">요금 컨펌 화면 내 노출</th>
+                                        <th style="font-size: 10px;">바우처 할인 가능</th>
+                                    </tr>
+                                    <tr>
+                                        <td id="tableMainItem" style="font-size: 11px; font-weight: 600;">미터기 요금</td>
+                                        <td id="tableMainTitle" style="font-size: 11px;">미터기 요금</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 11px; font-weight: 600;">통행료</td>
+                                        <td style="font-size: 11px;">통행료</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                        <td style="font-size: 11px; text-align: center;">X</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 11px; font-weight: 600;">주차비</td>
+                                        <td style="font-size: 11px;">주차비</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                        <td style="font-size: 11px; text-align: center;">X</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size: 11px; font-weight: 600;">호출 요금</td>
+                                        <td style="font-size: 11px;">호출 요금</td>
+                                        <td style="font-size: 11px; text-align: center;">X</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                        <td style="font-size: 11px; text-align: center;">O</td>
+                                    </tr>
+                                </table>
+                                <div class="field-note" style="margin-top: 8px;">
+                                    O=가능, X=불가
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ⑤ 결제정책 -->
+            <div class="section">
+                <div class="section-title">⑤ 결제정책 <span class="badge required">필수</span></div>
+                <table class="content-table">
+                    <tr>
+                        <td class="left-column">
+                            <div class="field">
+                                <label>라이더 결제 수단 <span class="badge required">필수</span></label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="payment" value="app" required> 앱 결제</label>
+                                    <label><input type="radio" name="payment" value="cash" required> 현장 결제</label>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>카드 등록 <span class="badge required">필수</span></label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="cardRequired" required> 필수</label>
+                                    <label><input type="radio" name="cardRequired" required> 선택</label>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>선결제 <span class="badge required">필수</span></label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="prepayment" required> 필수</label>
+                                    <label><input type="radio" name="prepayment" required> 선택</label>
+                                    <label><input type="radio" name="prepayment" required> 미지원</label>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>바우처 차감 (0원 페널티) <span class="badge required">필수</span></label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="voucherDeduction" required> true</label>
+                                    <label><input type="radio" name="voucherDeduction" required> false</label>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="right-column">
+                            <div class="guide-section">
+                                <div class="guide-title">작성 가이드</div>
+                                <div class="guide-box">
+                                    <strong>결제 수단:</strong> 앱 or 현장<br>
+                                    <strong>카드 등록:</strong> 필수 or 선택<br>
+                                    <strong>선결제:</strong> 필수 or 선택 or 미지원<br>
+                                    <strong>바우처:</strong> 차감 여부
+                                </div>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">지역별 예시</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th>항목</th>
+                                        <th>의왕</th>
+                                        <th>영암</th>
+                                        <th>영덕</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>결제수단</strong></td>
+                                        <td>앱</td>
+                                        <td>현장</td>
+                                        <td>앱</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>카드등록</strong></td>
+                                        <td>필수</td>
+                                        <td>선택</td>
+                                        <td>필수</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>선결제</strong></td>
+                                        <td>필수</td>
+                                        <td>선택</td>
+                                        <td>미지원</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>바우처차감</strong></td>
+                                        <td>false</td>
+                                        <td>true</td>
+                                        <td>false</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ⑥ 고객지원 -->
+            <div class="section">
+                <div class="section-title">⑥ 고객지원 <span class="badge required">필수</span></div>
+                <table class="content-table">
+                    <tr>
+                        <td class="left-column">
+                            <div class="field">
+                                <label>CS 전화번호 <span class="badge required">필수</span></label>
+                                <input type="tel" name="csPhone" placeholder="E.g. 1551-0456" required>
+                            </div>
+                            <div class="field">
+                                <label>심사처 전화번호 <span class="badge required">필수</span></label>
+                                <input type="tel" name="reviewPhone" placeholder="E.g. 1551-0456" required>
+                            </div>
+                            <div class="field">
+                                <label>알림톡 채널 <span class="badge required">필수</span></label>
+                                <input type="text" name="alimtalk" placeholder="E.g. 셔클" required>
+                            </div>
+                        </td>
+                        <td class="right-column">
+                            <div class="guide-section">
+                                <div class="guide-title">작성 가이드</div>
+                                <div class="guide-box">
+                                    <strong>CS 전화:</strong> 고객 지원 번호<br>
+                                    <strong>심사처:</strong> 기사 가입 심사 번호<br>
+                                    <strong>알림톡:</strong> 발송 채널명
+                                </div>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">지역별 예시</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th>항목</th>
+                                        <th>의왕</th>
+                                        <th>영암</th>
+                                        <th>영덕</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CS번호</strong></td>
+                                        <td>1551-0456</td>
+                                        <td>1551-0456</td>
+                                        <td>1688-0420</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>심사처번호</strong></td>
+                                        <td>1551-0456</td>
+                                        <td>1511-0456</td>
+                                        <td>1511-0456</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>알림톡</strong></td>
+                                        <td>셔클</td>
+                                        <td>셔클</td>
+                                        <td>셔클</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ⑦ 배차정책 -->
+            <div class="section">
+                <div class="section-title">⑦ 배차정책 <span class="badge optional">선택</span></div>
+                <table class="content-table">
+                    <tr>
+                        <td class="left-column">
+                            <div class="field">
+                                <label>최대 배차 대수 <span class="badge optional">선택</span></label>
+                                <input type="text" name="maxDispatch" placeholder="E.g. 기본값(3대) 또는 5대">
+                                <div class="field-note">기본값: 3대</div>
+                            </div>
+                            <div class="field">
+                                <label>콜카드 타임아웃 (초) <span class="badge optional">선택</span></label>
+                                <input type="text" name="callTimeout" placeholder="E.g. 기본값(5초) 또는 10초">
+                                <div class="field-note">기본값: 5초</div>
+                            </div>
+                            <div class="field">
+                                <label>최대 배차 거리 (km) <span class="badge optional">선택</span></label>
+                                <input type="text" name="maxDistance" placeholder="E.g. 5km 또는 10km 또는 없음">
+                            </div>
+                        </td>
+                        <td class="right-column">
+                            <div class="guide-section">
+                                <div class="guide-title">작성 가이드</div>
+                                <div class="guide-box">
+                                    <strong>최대 배차:</strong> 동시 배차 최대 차량<br>
+                                    <strong>타임아웃:</strong> 콜카드 표시 시간<br>
+                                    <strong>거리:</strong> 배차 최대 범위 km
+                                </div>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">지역별 예시</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th>항목</th>
+                                        <th>의왕</th>
+                                        <th>영암</th>
+                                        <th>영덕</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>배차대수</strong></td>
+                                        <td>기본값</td>
+                                        <td>5대</td>
+                                        <td>기본값</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>타임아웃</strong></td>
+                                        <td>10초</td>
+                                        <td>10초</td>
+                                        <td>15초</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>배차거리</strong></td>
+                                        <td>5km</td>
+                                        <td>25km</td>
+                                        <td>45km</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ⑧ 운영관련 -->
+            <div class="section">
+                <div class="section-title">⑧ 운영관련 <span class="badge optional">선택</span></div>
+                <table class="content-table">
+                    <tr>
+                        <td class="left-column">
+                            <div class="field">
+                                <label>픽업 지연 모니터링 <span class="badge optional">선택</span></label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="pickupMonitoring"> true</label>
+                                    <label><input type="radio" name="pickupMonitoring"> false</label>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>정산 기관 코드 <span class="badge optional">선택</span></label>
+                                <input type="text" name="settlementCode" placeholder="E.g. GYEONGGI_VOUCHER">
+                            </div>
+                            <div class="field">
+                                <label>매칭 알림톡 <span class="badge optional">선택</span></label>
+                                <input type="text" name="matchingAlimtalk" placeholder="E.g. 없음 또는 템플릿 ID">
+                            </div>
+                        </td>
+                        <td class="right-column">
+                            <div class="guide-section">
+                                <div class="guide-title">작성 가이드</div>
+                                <div class="guide-box">
+                                    <strong>모니터링:</strong> 픽업 지연 감시 활성화<br>
+                                    <strong>정산코드:</strong> EZL 정산 기관 코드<br>
+                                    <strong>알림톡:</strong> 첫 이용 시 발송
+                                </div>
+                            </div>
+                            <div class="guide-section">
+                                <div class="guide-title">지역별 예시</div>
+                                <table class="example-table">
+                                    <tr>
+                                        <th>항목</th>
+                                        <th>의왕</th>
+                                        <th>영암</th>
+                                        <th>영덕</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>모니터링</strong></td>
+                                        <td>true</td>
+                                        <td>false</td>
+                                        <td>false</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>정산코드</strong></td>
+                                        <td>GYEONGGI_VOUCHER</td>
+                                        <td>YOUNGAM_PUBLIC</td>
+                                        <td>YOUNGDEOK_TOURISM</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>알림톡</strong></td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="button-group">
+                <button type="button" class="btn-copy" onclick="copyMarkdown()">📋 마크다운 복사</button>
+                <button type="button" class="btn-reset" onclick="resetForm()">🔄 초기화</button>
+            </div>
+        </form>
+
+        <div class="footer">
+            <p>로컬 저장: 브라우저 상태 유지 | 데이터는 자동 저장되지 않습니다</p>
+        </div>
+    </div>
+
+    <script>
+        function updateArea() {
+            const type = document.querySelector('[name="areaType"]:checked');
+            if (!type) return;
+            document.getElementById('adminArea').style.display = type.value === 'admin' ? 'block' : 'none';
+            document.getElementById('polygonArea').style.display = type.value === 'polygon' ? 'block' : 'none';
+        }
+
+        function updateFareType() {
+            const fareType = document.querySelector('[name="fareType"]:checked');
+            const label = document.getElementById('meterLabel');
+            const input = document.getElementById('meterTitleInput');
+            const driverInputRadios = document.querySelectorAll('[name="meterDriverInput"]');
+
+            if (!fareType) {
+                label.textContent = "미터기 / 거리기준 요금";
+                input.placeholder = "미터기 요금 또는 거리 기준 요금";
+                driverInputRadios.forEach(radio => radio.disabled = false);
+            } else if (fareType.value === 'METER') {
+                label.textContent = "미터기 요금";
+                input.placeholder = "E.g. 미터기 요금";
+                driverInputRadios.forEach(radio => radio.disabled = false);
+            } else if (fareType.value === 'DISTANCE') {
+                label.textContent = "거리기준 요금";
+                input.placeholder = "E.g. 거리기준 요금";
+                driverInputRadios.forEach(radio => radio.disabled = false);
+            }
+        }
+
+        function toggleItem(item) {
+            const checkbox = document.querySelector('[name="include' + item.charAt(0).toUpperCase() + item.slice(1) + '"]');
+            const fieldsDiv = document.getElementById(item + '-fields');
+            if (fieldsDiv) {
+                fieldsDiv.style.display = checkbox.checked ? 'block' : 'none';
+            }
+        }
+
+        function copyMarkdown() {
+            const form = document.getElementById('form');
+
+            // 필수 필드 체크
+            const required = [
+                'serviceName', 'riderTitle', 'description', 'icon',
+                'weekday', 'saturday', 'sunday', 'holiday',
+                'areaType', 'baseFare', 'cancelPenalty', 'driverDisplay',
+                'fareType', 'meterTitle', 'meterDriverInput', 'meterDisplay', 'meterDiscount',
+                'payment', 'cardRequired', 'prepayment', 'voucherDeduction',
+                'csPhone', 'reviewPhone', 'alimtalk'
+            ];
+
+            let isEmpty = false;
+            for (let field of required) {
+                const el = form.elements[field];
+                if (!el) continue;
+
+                if (el.type === 'radio') {
+                    if (!form.querySelector(`[name="${field}"]:checked`)) {
+                        isEmpty = true;
+                        break;
+                    }
+                } else if (!el.value) {
+                    isEmpty = true;
+                    break;
+                }
+            }
+
+            if (isEmpty) {
+                showToast('⚠️ 필수 항목을 모두 입력해주세요');
+                return;
+            }
+
+            const data = new FormData(form);
+            const serviceName = data.get('serviceName') || '';
+
+            let md = `## ${serviceName}\n\n`;
+
+            // 기본정보
+            md += `### 기본정보\n| 항목 | 값 |\n|------|-----|\n`;
+            md += `| 서비스명 | ${data.get('serviceName')} |\n`;
+            md += `| 라이더 노출 타이틀 | ${data.get('riderTitle')} |\n`;
+            md += `| 설명 | ${data.get('description')} |\n`;
+            md += `| 아이콘 | ${data.get('icon')} |\n\n`;
+
+            // 운영시간
+            md += `### 운영시간\n| 요일 | 시간 |\n|------|-----|\n`;
+            md += `| 평일(월~금) | ${data.get('weekday')} |\n`;
+            md += `| 토요일 | ${data.get('saturday')} |\n`;
+            md += `| 일요일 | ${data.get('sunday')} |\n`;
+            md += `| 공휴일 | ${data.get('holiday')} |\n\n`;
+
+            // 서비스지역
+            md += `### 서비스지역\n| 항목 | 값 |\n|------|-----|\n`;
+            const areaType = data.get('areaType') || '';
+            md += `| 방식 | ${areaType === 'admin' ? '행정구역' : '폴리곤'} |\n`;
+            if (areaType === 'admin') {
+                md += `| 출발지 | ${data.get('originAdmin')} |\n`;
+                md += `| 도착지 | ${data.get('destAdmin')} |\n`;
+            } else {
+                md += `| 폴리곤 좌표 | ${data.get('polygonCoords')} |\n`;
+            }
+            if (data.get('odRule')) md += `| 조건부 규칙 | ${data.get('odRule')} |\n`;
+            md += `\n`;
+
+            // 요금정책
+            md += `### 요금정책\n| 항목 | 값 |\n|------|-----|\n`;
+            md += `| 기본요금 | ${data.get('baseFare')}원 |\n`;
+            md += `| 취소페널티 | ${data.get('cancelPenalty')}원 |\n`;
+            md += `| 기사 입력 화면 노출 | ${data.get('driverDisplay')} |\n`;
+            md += `| 요금 방식 | ${data.get('fareType') === 'METER' ? '미터기' : '거리기준'} |\n\n`;
+
+            // 요금 항목 설정
+            md += `**요금 항목 설정**\n| 항목 | 앱 내 노출 명칭 | 기사 입력 여부 | 컨펌 노출 | 바우처 할인 |\n`;
+            md += `|------|-------|-------|-------|-------|\n`;
+
+            const fareLabel = data.get('fareType') === 'METER' ? '미터기 요금' : '거리기준 요금';
+            md += `| ${fareLabel} | ${data.get('meterTitle')} | ${data.get('meterDriverInput') || '-'} | ${data.get('meterDisplay') || '-'} | ${data.get('meterDiscount') || '-'} |\n`;
+
+            if (data.get('includeCall')) {
+                md += `| 호출 요금 | ${data.get('callTitle')} | ${data.get('callDriverInput') || '-'} | ${data.get('callDisplay') || '-'} | ${data.get('callDiscount') || '-'} |\n`;
+            }
+            if (data.get('includeToll')) {
+                md += `| 통행료 | ${data.get('tollTitle')} | ${data.get('tollDriverInput') || '-'} | ${data.get('tollDisplay') || '-'} | ${data.get('tollDiscount') || '-'} |\n`;
+            }
+            if (data.get('includeParking')) {
+                md += `| 주차비 | ${data.get('parkingTitle')} | ${data.get('parkingDriverInput') || '-'} | ${data.get('parkingDisplay') || '-'} | ${data.get('parkingDiscount') || '-'} |\n`;
+            }
+            md += `\n`;
+
+            // 결제정책
+            md += `### 결제정책\n| 항목 | 값 |\n|------|-----|\n`;
+            md += `| 결제수단 | ${data.get('payment') === 'app' ? '앱 결제' : '현장 결제'} |\n`;
+            md += `| 카드등록 | ${data.get('cardRequired')} |\n`;
+            md += `| 선결제 | ${data.get('prepayment')} |\n`;
+            md += `| 바우처차감 | ${data.get('voucherDeduction')} |\n\n`;
+
+            // 고객지원
+            md += `### 고객지원\n| 항목 | 값 |\n|------|-----|\n`;
+            md += `| CS번호 | ${data.get('csPhone')} |\n`;
+            md += `| 심사처번호 | ${data.get('reviewPhone')} |\n`;
+            md += `| 알림톡 | ${data.get('alimtalk')} |\n\n`;
+
+            // 배차정책
+            md += `### 배차정책\n| 항목 | 값 |\n|------|-----|\n`;
+            if (data.get('maxDispatch')) md += `| 최대 배차 대수 | ${data.get('maxDispatch')} |\n`;
+            if (data.get('callTimeout')) md += `| 콜카드 타임아웃 | ${data.get('callTimeout')} |\n`;
+            if (data.get('maxDistance')) md += `| 최대 배차 거리 | ${data.get('maxDistance')} |\n`;
+            md += `\n`;
+
+            // 운영관련
+            md += `### 운영관련\n| 항목 | 값 |\n|------|-----|\n`;
+            if (data.get('pickupMonitoring')) md += `| 픽업 지연 모니터링 | ${data.get('pickupMonitoring')} |\n`;
+            if (data.get('settlementCode')) md += `| 정산 기관 코드 | ${data.get('settlementCode')} |\n`;
+            if (data.get('matchingAlimtalk')) md += `| 매칭 알림톡 | ${data.get('matchingAlimtalk')} |\n`;
+
+            navigator.clipboard.writeText(md).then(() => {
+                showToast('✅ 마크다운이 복사되었습니다');
+            }).catch(() => {
+                showToast('❌ 복사에 실패했습니다');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        function resetForm() {
+            document.getElementById('form').reset();
+            document.querySelectorAll('[id$="-fields"]').forEach(el => el.style.display = 'none');
+            document.getElementById('adminArea').style.display = 'none';
+            document.getElementById('polygonArea').style.display = 'none';
+        }
+
+        // 체크박스 변화 감지 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = ['call', 'toll', 'parking'];
+            checkboxes.forEach(item => {
+                const checkbox = document.querySelector('[name="include' + item.charAt(0).toUpperCase() + item.slice(1) + '"]');
+                if (checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        toggleItem(item);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
